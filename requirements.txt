@@ -1,0 +1,16 @@
+ethon
+python-decouple
+pyrogram
+telethon
+tgcrypto
+pymongo
+motor
+pymongo[srv]
+dnspython
+heroku3
+pyromod
+TgCrypto
+psutil
+wget
+gitpython
+pyromod 
