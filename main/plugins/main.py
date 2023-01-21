@@ -294,7 +294,7 @@ async def get_pmsg(userbot, client, sender, msg_link, edit):
                 await edit.edit("Uploading image file...")
                 await Bot.send_photo(sender, file, caption=caption)
                 await edit.delete()
-                #await set_timer(client, sender, process, timer)
+                await set_timer(client, sender, process, timer)
                 #for audio
             elif str(file).split(".")[-1] in ['mp3', 'ogg', 'wav', 'm4a', 'Flac', 'AAC']:
                 
@@ -302,7 +302,7 @@ async def get_pmsg(userbot, client, sender, msg_link, edit):
                 await edit.edit("Uploading Audio File...")
                 await Bot.send_audio(sender, file, caption=caption)
                 await edit.delete() 
-                #await set_timer(client, sender, process, timer)
+                await set_timer(client, sender, process, timer)
             else:
                 await Bot.send_document(
                     sender,
@@ -317,7 +317,7 @@ async def get_pmsg(userbot, client, sender, msg_link, edit):
                     )
                 )
             await edit.delete()
-            #await set_timer(client, sender, process, timer) 
+            await set_timer(client, sender, process, timer) 
         except Exception as e:
             await edit.edit(F'ERROR: {str(e)}')
             return 
