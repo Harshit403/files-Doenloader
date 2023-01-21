@@ -1,5 +1,4 @@
 #pyrogrammers
-from pyrogram.enums import MessageMediaType
 from .. import bot as Drone
 from pyromod import listen
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
@@ -58,28 +57,15 @@ async def get_msg(userbot, client, sender, msg_link, edit):
     chat = ""
     msg_id = int(msg_link.split("/")[-1])
     if 't.me/c/' in msg_link:
-        st, r = check_timer(sender, process, timer) 
-        if st == False:
-            return await edit.edit(r) 
+        #st, r = check_timer(sender, process, timer) 
+        #if st == False:
+            #return await edit.edit(r) 
         chat = int('-100' + str(msg_link.split("/")[-2]))
         try:
             msg = await userbot.get_messages(chat, msg_id)
-            if msg.media:
-                if msg.media == MessageMediaType.WEB_PAGE:
-                    edit = await client.edit_message_text(sender, edit_id, "⚡")
-                    await client.send_message(sender, msg.text.markdown)
-                    await edit.delete()
-                    return
-            if not msg.media:
-                if msg.text:
-                    #edit = await client.edit_message_text(sender, edit_id, "⏳")
-                    await client.send_message(sender, msg.text.markdown)
-                    await edit.delete()
-                    return
-                if msg.empty or msg.service or msg.dice or msg.location:
-                    edit = await client.edit_message_text(sender, edit_id, "This message doesn't exist.")
-                    return 
+
             edit = await edit.edit('Processing...')
+#end
             file = await userbot.download_media(
                 msg,
                 progress=progress_for_pyrogram,
@@ -117,41 +103,19 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                         time.time()
                     )
                 )
-                try:
-                    os.remove(file)
-                except:
-                    pass
-               # try:
-               #     Fuck.remove(f'{sender}')
-               # except:
-              #      pass
             elif str(file).split(".")[-1] in ['jpg', 'jpeg', 'png', 'webp']:
                 await edit.edit("Uploading image file...")
                 await bot.send_file(sender, file, caption=caption)
                 await edit.delete()
-                await set_timer(client, sender, process, timer)
-                try:
-                    os.remove(file)
-                except:
-                    pass
-             #   try:
-                #    Fuck.remove(f'{sender}')
-              #  except:
-                #    pass
+                #await set_timer(client, sender, process, timer)
                 #for audio
             elif str(file).split(".")[-1] in ['mp3', 'ogg', 'wav', 'm4a', 'Flac', 'AAC']:
-                await edit.edit("🎵 Uploading Audio File...")
+                
+                
+                await edit.edit("Uploading Audio File...")
                 await client.send_audio(sender, file, caption=caption)
                 await edit.delete() 
-                await set_timer(client, sender, process, timer)
-                try:
-                    os.remove(file)
-                except:
-                    pass
-             #   try:
-               #     Fuck.remove(f'{sender}')
-               # except:
-             #       pass
+                #await set_timer(client, sender, process, timer)
             else:
                 await client.send_document(
                     sender,
@@ -166,23 +130,15 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                     )
                 )
             await edit.delete()
-            await set_timer(client, sender, process, timer) 
-            try:
-                os.remove(file)
-            except:
-                pass
-          #  try:
-             #   Fuck.remove(f'{sender}')
-           # except:
-           #     pass
+            #await set_timer(client, sender, process, timer) 
         except Exception as e:
-            await edit.edit(F'Send message link of joined channel only.\nError:{str(e)}')
+            await edit.edit(F'ERROR: {str(e)}')
             return 
     else:
-        #st, r = check_timer(sender, process, timer) 
-        #if st == False:
-            #await client.send_message(sender, r)
-            #return await edit.delete()
+        st, r = check_timer(sender, process, timer) 
+        if st == False:
+            await client.send_message(sender, r)
+            return await edit.delete()
         chat =  msg_link.split("/")[-2]
         try:
             await client.copy_message(int(sender), chat, msg_id)
@@ -192,7 +148,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             #)
             #await client.reply(event.chat.id, text, reply_markup=reply_markup)
             await edit.delete()
-            #await set_timer(client, sender, process, timer)
+            await set_timer(client, sender, process, timer)
         except FloodWait as f:
             try: 
                 await get_pmsg(userbot, bot, sender, msg_link, edit)
@@ -201,13 +157,13 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                 return await edit.edit(f"Bot is limited by telegram for {f.value + 2} seconds.\nPlease wait until then or use @saverestrictedcontentsbot if working.")
                 await asyncio.sleep(f.value)
         except Exception as e:
-            print(e)
-            try:
+ #shit fuck code🤣
+            if "empty" in {str(e)}:
                 await get_pmsg(userbot, bot, sender, msg_link, edit)
-            except Exception as e:
+            else:
+#fuck off slut
                 print(e)
-               
-           #return await edit.edit(sender, f'{str(e)}')
+                return await edit.edit(sender, f'{str(e)}')
         except BadRequest.CHANNEL_INVALID:
             return await edit.edit('Your Channel is unavailable.')
         except BadRequest.CHANNEL_PRIVATE:
@@ -267,7 +223,6 @@ async def clone(bot, event):
         xy = await join(userbot, link)
         await edit.edit(xy)
         return 
-"""
     if 't.me' in link:
         try:
             await get_msg(userbot, bot, event.chat.id, link, edit)
@@ -282,7 +237,7 @@ async def clone(bot, event):
         except BadRequest.CHANNEL_PRIVATE:
             return await edit.edit('Join the channel first.')
             await asyncio.sleep(2)
-"""
+
 ##########################Public group#############################
 async def get_pmsg(userbot, client, sender, msg_link, edit):
     chat = ""
@@ -560,7 +515,3 @@ async def clone(event):
         except Exception as e:
             return await edit.edit(f'Error: `{str(e)}`')
             await asyncio.sleep(5)
-try:
-    Bot.run()
-except:
-    pass
