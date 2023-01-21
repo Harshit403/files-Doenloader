@@ -560,7 +560,7 @@ async def clone(event):
         except Exception as e:
             return await edit.edit(f'Error: `{str(e)}`')
             await asyncio.sleep(5)
-try:
-    Bot.run()
-except:
-    pass
+#try:
+#    Bot.run()
+#except:
+#    pass
