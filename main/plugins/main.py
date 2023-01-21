@@ -63,7 +63,21 @@ async def get_msg(userbot, client, sender, msg_link, edit):
         chat = int('-100' + str(msg_link.split("/")[-2]))
         try:
             msg = await userbot.get_messages(chat, msg_id)
-
+            if msg.media:
+                if msg.media == MessageMediaType.WEB_PAGE:
+                    edit = await client.edit_message_text(sender, edit_id, "⚡")
+                    await client.send_message(sender, msg.text.markdown)
+                    await edit.delete()
+                    return
+            if not msg.media:
+                if msg.text:
+                    #edit = await client.edit_message_text(sender, edit_id, "⏳")
+                    await client.send_message(sender, msg.text.markdown)
+                    await edit.delete()
+                    return
+                if msg.empty or msg.service or msg.dice or msg.location:
+                    edit = await client.edit_message_text(sender, edit_id, "This message doesn't exist.")
+                    return 
             edit = await edit.edit('Processing...')
 #end
             file = await userbot.download_media(
@@ -223,7 +237,7 @@ async def clone(bot, event):
         xy = await join(userbot, link)
         await edit.edit(xy)
         return 
-    if 't.me' in link:
+    if 't.me/c' in link:
         try:
             await get_msg(userbot, bot, event.chat.id, link, edit)
         except BadRequest.CHANNEL_INVALID:
