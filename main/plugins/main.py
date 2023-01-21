@@ -440,4 +440,8 @@ async def clone(event):
 
 
 # Start Clients
-Bot.start()
+try:
+    Bot.start()
+except Exception as e:
+    print(e)
+    sys.exit(1)
