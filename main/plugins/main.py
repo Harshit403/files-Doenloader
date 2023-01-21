@@ -108,7 +108,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                 await edit.edit("Uploading image file...")
                 await bot.send_file(sender, file, caption=caption)
                 await edit.delete()
-                #await set_timer(client, sender, process, timer)
+                await set_timer(client, sender, process, timer)
                 #for audio
             elif str(file).split(".")[-1] in ['mp3', 'ogg', 'wav', 'm4a', 'Flac', 'AAC']:
                 
@@ -116,7 +116,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                 await edit.edit("Uploading Audio File...")
                 await client.send_audio(sender, file, caption=caption)
                 await edit.delete() 
-                #await set_timer(client, sender, process, timer)
+                await set_timer(client, sender, process, timer)
             else:
                 await client.send_document(
                     sender,
@@ -131,7 +131,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                     )
                 )
             await edit.delete()
-            #await set_timer(client, sender, process, timer) 
+            await set_timer(client, sender, process, timer) 
         except Exception as e:
             await edit.edit(F'ERROR: {str(e)}')
             return 
