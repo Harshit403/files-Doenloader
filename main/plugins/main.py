@@ -58,9 +58,9 @@ async def get_msg(userbot, client, sender, msg_link, edit):
     chat = ""
     msg_id = int(msg_link.split("/")[-1])
     if 't.me/c/' in msg_link:
-        #st, r = check_timer(sender, process, timer) 
-        #if st == False:
-            #return await edit.edit(r) 
+        st, r = check_timer(sender, process, timer) 
+        if st == False:
+            return await edit.edit(r) 
         chat = int('-100' + str(msg_link.split("/")[-2]))
         try:
             msg = await userbot.get_messages(chat, msg_id)
