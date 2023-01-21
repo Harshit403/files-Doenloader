@@ -1,4 +1,3 @@
-
 #pyrogrammers
 from pyrogram.enums import MessageMediaType
 from .. import bot as Drone
