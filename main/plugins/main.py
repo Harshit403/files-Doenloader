@@ -1,4 +1,4 @@
-#pyrogrammers
+
 from .. import bot as Drone
 from pyrogram.enums import MessageMediaType
 from pyromod import listen
