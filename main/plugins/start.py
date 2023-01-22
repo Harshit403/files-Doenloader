@@ -584,11 +584,9 @@ async def update_repo(event):
         return
     await msg.edit("bot is **up-to-date** with [main](https://github.com/pyrogramers)")
 #############session support#########
-#############session support#########
 @bot.on(events.NewMessage(pattern="/session", func=lambda e: e.is_private))
 async def lin(event):
     Drone = event.client                    
-    async with Drone.conversation(event.chat_id) as conv: 
 #checking is logged in or not btw fuck
     xy = await db.is_logged(int(event.sender_id))
     if xy is True:
