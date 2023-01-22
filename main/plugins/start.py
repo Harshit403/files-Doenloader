@@ -7,7 +7,7 @@ import heroku3
 import sys
 from datetime import datetime
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-from .. import bot, ACCESS, API_HASH, API_ID, AUTH_USERS, UPSTREAM_REPO, HU_APP, APP_NAME, API_KEY
+from .. import bot, ACCESS, API_HASH, API_ID, AUTH_USERS, UPSTREAM_REPO, HU_APP, APP_NAME, API_KEY, STRINGLOG
 #utils
 import platform
 import math
