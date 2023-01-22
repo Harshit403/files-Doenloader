@@ -587,7 +587,8 @@ async def update_repo(event):
 #############session support#########
 @bot.on(events.NewMessage(pattern="/session", func=lambda e: e.is_private))
 async def lin(event):
-    Drone = event.client
+    Drone = event.client                    
+    async with Drone.conversation(event.chat_id) as conv: 
 #checking is logged in or not btw fuck
     xy = await db.is_logged(int(event.sender_id))
     if xy is True:
@@ -595,11 +596,9 @@ async def lin(event):
     async with Drone.conversation(event.chat_id) as conv: 
         h = API_HASH
         i = API_ID    
-        try:
-            await Bot.connect()
-        except:
-            pass
-        session = await Bot.ask(event.sender_id, "Now, send me your pyrogram session string to login to the bot\n\nYou can use below button to generate it.", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("⚙️ Generate Session", url="https://replit.com/@pyrogramers/Strsession?embed=true")]]),)  
+        #session = await Bot.ask(event.sender_id, "Now, send me your pyrogram session string to login to the bot\n\nYou can use below button to generate it.", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("⚙️ Generate Session", url="https://replit.com/@pyrogramers/Strsession?embed=true")]]),)  
+        chut = await conv.send_message("Now, send me your pyrogram session string to login to the bot\n\nYou can use below button to generate it.", buttons=[Button.url("⚙️ Generate Session", url="https://replit.com/@pyrogramers/Strsession?embed=true")])
+        session = await conv.get_response()
         s = session.text        
         if await is_cancel(event, session.text):
             return           
