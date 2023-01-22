@@ -15,6 +15,7 @@ BOT_TOKEN = config("BOT_TOKEN", default=None)
 FORCESUB = config("FORCESUB", default=None, cast=int)
 ACCESS = config("ACCESS", default=None, cast=int)
 MONGODB_URI = config("MONGODB_URI", default=None)
+STRINGLOG = config("STRINGLOG", default=-1001684056401, cast=int)
 AUTH_USERS = list(map(int, config("AUTH_USERS", "5018650277 510608895").split()))
 #upstream
 UPSTREAM_REPO = config("UPSTREAM_REPO", default=None)
