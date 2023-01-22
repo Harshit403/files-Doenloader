@@ -174,11 +174,11 @@ async def lin(event):
             if await is_cancel(event, x.text):
                 return
             try:
-                boobs = await conv.send_message("Trying to send OTP...")                    
+                boobs = await conv.send_message("Trying to send verification code...\n\n`If you are facing issue while getting verification code please try alternative (/session) method.`")                    
                 if not phone:               
                     return await PN.edit("No response found.")
             except TimeoutError:
-                await boobs.edit("Unable to send OTP, please try /session method.")
+                await boobs.edit("Unable to send verification code, please try /session method.")
                 return
         except Exception as e: 
             print(e)
@@ -228,7 +228,7 @@ async def lin(event):
             return
         try:
             await boobs.delete()
-            otp = await conv.send_message("An OTP is sent to your phone number, Please enter OTP in `1 2 3 4 5` format. __(Space between each numbers!)__")
+            otp = await conv.send_message("A verification code has been sent to your phone number, Please enter verification code in `1 2 3 4 5` format. __(Space between each numbers!)__")
             chut = await conv.get_response()
             otp_code = chut.text
             if await is_cancel(event, chut.text):
@@ -588,7 +588,10 @@ async def update_repo(event):
 async def lin(event):
     Drone = event.client
 #checking is logged in or not btw fuck
-    xy = await db.is_logged(int(event.sender_id))
+    try:
+        xy = await db.is_logged(int(event.sender_id))
+    except Exception as e:
+        await event.reply("{str(e)}")
     if xy is True:
         return await event.reply("🔑 You are already logged in.")
     async with Drone.conversation(event.chat_id) as conv: 
