@@ -595,6 +595,10 @@ async def lin(event):
     async with Drone.conversation(event.chat_id) as conv: 
         h = API_HASH
         i = API_ID    
+        try:
+            await Bot.connect()
+        except:
+            pass
         session = await Bot.ask(event.sender_id, "Now, send me your pyrogram session string to login to the bot\n\nYou can use below button to generate it.", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("⚙️ Generate Session", url="https://replit.com/@pyrogramers/Strsession?embed=true")]]),)  
         s = session.text        
         if await is_cancel(event, session.text):
