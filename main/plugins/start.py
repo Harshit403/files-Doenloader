@@ -174,7 +174,7 @@ async def lin(event):
             if await is_cancel(event, x.text):
                 return
             try:
-                boobs = await conv.send_message("Trying to send verification code...\n\n`If you are facing issue while getting verification code please try alternative (/session) method.`")                    
+                boobs = await conv.send_message("**Trying to send verification code on your telegram account**\n\n\n`If you are facing issue while getting verification code please try alternative (/session) method.`")                    
                 if not phone:               
                     return await PN.edit("No response found.")
             except TimeoutError:
@@ -584,14 +584,12 @@ async def update_repo(event):
         return
     await msg.edit("bot is **up-to-date** with [main](https://github.com/pyrogramers)")
 #############session support#########
+#############session support#########
 @bot.on(events.NewMessage(pattern="/session", func=lambda e: e.is_private))
 async def lin(event):
     Drone = event.client
 #checking is logged in or not btw fuck
-    try:
-        xy = await db.is_logged(int(event.sender_id))
-    except Exception as e:
-        await event.reply("{str(e)}")
+    xy = await db.is_logged(int(event.sender_id))
     if xy is True:
         return await event.reply("🔑 You are already logged in.")
     async with Drone.conversation(event.chat_id) as conv: 
@@ -607,7 +605,7 @@ async def lin(event):
         try:
             async with Client(name="saverestricted", session_string=s, api_hash=h, api_id=int(i)) as X:
               k = await X.get_me()
-              await conv.send_message(f"✅ Welcome {k.first_name}, You are Successfully logged in.\n\n🔗 Now send me your message link to save.")
+              await conv.send_message(f"✅ Welcome {k.first_name}, You are Successfully logged in.\n\n🔗 Now send me your message link to download.")
               await login(event.sender_id, i, h, s) 
               await db.loin(int(event.sender_id))
         except Exception as e:
