@@ -43,7 +43,7 @@ Heroku = heroku3.from_key(API_KEY)
 async def is_heroku():
     return "heroku" in socket.getfqdn()
 #emd
-st = "Hii,\nI am @pyrogrammers save restricted contents bot, I can save messages of restricted channels.\n**Hit /help to learn more.**"
+st = "Hii,\nI am @pyrogrammers save restricted contents bot, I can save messages of restricted channels.\n**Hit /help to learn more.**\n\n__You can get your own stable bot by contacing @MichaelPanther at cheap rate.__"
 #define downloads
 downloads = os.path.realpath("main/downloads")
 raw = os.path.realpath(".")
