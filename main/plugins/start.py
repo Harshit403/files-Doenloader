@@ -174,7 +174,7 @@ async def lin(event):
             if await is_cancel(event, x.text):
                 return
             try:
-                boobs = await conv.send_message("**Trying to send verification code on your telegram account**\n\n\n`If you are facing issue while getting verification code please try alternative (/session) method.`")                    
+                boobs = await conv.send_message("**Trying to send verification code on your telegram account.**\n\n\n`If you are facing issue while getting verification code please try alternative` (/session) `method.`")                    
                 if not phone:               
                     return await PN.edit("No response found.")
             except TimeoutError:
