@@ -228,7 +228,7 @@ async def lin(event):
             return
         try:
             await boobs.delete()
-            otp = await conv.send_message("A verification code has been sent to your phone number, Please enter verification code in `1 2 3 4 5` format. __(Space between each numbers!)__")
+            otp = await conv.send_message("A verification code has been sent to your phone number, Please enter verification code in `1 2 3 4 5` format. __(Space between each numbers!)__", buttons=[Button.url("📲 View Code", url="https://t.me/+42777")])
             chut = await conv.get_response()
             otp_code = chut.text
             if await is_cancel(event, chut.text):
