@@ -72,7 +72,7 @@ async def start(event):
     if time_taken_s >= 700:
         #await event.answer("🔴 Bot Restarted due to high ping value.")
         #await event.send_message(LOGS, "#restart Restarting... It will take upto 5 seconds.")
-        await Dick.edit(f'👋 Hey **{event.sender.first_name}**,\n\nI am Save Restricted Contents Bot, I can save files of restricted channels as well as group.\n\n__Hit /help to learn more.__\n__Get personal stable bot from @MichaelPanther at cheap rate.__', 
+        await Dick.edit(f'👋 Hey **{event.sender.first_name}**,\n\nI am Save Restricted Contents Bot, I can save files of restricted channels as well as group.\n\n__Hit /help to learn more.__\n\n__Get personal stable bot from @MichaelPanther at cheap rate.__', 
                       buttons=[
                         [Button.url("📢 Updates Channel", url="https://t.me/Pyrogrammers"),
                          Button.url("👥 Support Group", url="https://t.me/+e0hay-RhwP45ZjM1")],
@@ -89,7 +89,7 @@ async def start(event):
         os.execl(sys.executable, sys.executable, *sys.argv)
         quit()
     else:
-        await Dick.edit(f'👋 Hi **{event.sender.first_name}**,\n\nI am Save Restricted Contents Bot, I can save files of restricted channels as well as group.\n\n__Hit /help to learn more.__', 
+        await Dick.edit(f'👋 Hi **{event.sender.first_name}**,\n\nI am Save Restricted Contents Bot, I can save files of restricted channels as well as group.\n\n__Hit /help to learn more.__\n\nGet personal stable bot from @MichaelPanther at cheap rate.__', 
                       buttons=[
                         [Button.url("📢 Updates Channel", url="https://t.me/pyrogrammers"),
                          Button.url("👥 Support Group", url="https://t.me/+e0hay-RhwP45ZjM1")],
