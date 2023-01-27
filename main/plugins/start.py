@@ -600,9 +600,14 @@ async def lin(event):
         h = API_HASH
         i = API_ID    
         #session = await Bot.ask(event.sender_id, "Now, send me your pyrogram session string to login to the bot\n\nYou can use below button to generate it.", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("⚙️ Generate Session", url="https://replit.com/@pyrogramers/Strsession?embed=true")]]),)  
-        chut = await conv.send_message("Now, send me your pyrogram session string to login to the bot\n\nYou can use below button to generate it.", buttons=[Button.url("⚙️ Generate Session", url="https://replit.com/@pyrogramers/Strsession?embed=true")])
-        session = await conv.get_response()
-        s = session.text        
+        try:
+            chut = await conv.send_message("Now, send me your pyrogram session string to login to the bot\n\nYou can use below button to generate it.", buttons=[Button.url("⚙️ Generate Session", url="https://replit.com/@pyrogramers/Strsession?embed=true")])
+            session = await conv.get_response()
+            s = session.text      
+        except TimeoutError:
+            await conv.send_message("Timed out, press /session to try again.")
+        except Exception as e:
+            print(e)
         if await is_cancel(event, session.text):
             return           
         if not len(s) >= 300:
