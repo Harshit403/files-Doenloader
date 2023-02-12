@@ -335,7 +335,7 @@ async def out(event):
 # callbacks
 @bot.on(events.callbackquery.CallbackQuery(data="cbdonate"))
 async def cbdonate(event):              
-    await event.edit("It's pleasure for me that you are donating me for all my efforts and work!\n\nUSDT [TETHER] (Network TRC20)\n`TMbCbxLYCFjTEDaW4MAqamfKzb7XixxBir`\n\nBTC [Bitcoin]\n`bc1ql4fxwhkw7g7jl7g26kwpzlqf7kvjr8evrvv08s`", buttons=[Button.url("Other Ways", url="https://telegram.me/MichaelPanther")])
+    await event.edit("It's pleasure for me that you are donating me for all my efforts and work!\n\nUSDT [TETHER] (Network TRC20)\n`Not available`\n\nBTC [Bitcoin]\n`Not available`", buttons=[Button.url("Other Ways", url="https://telegram.me/MichaelPanther")])
 
 @bot.on(events.callbackquery.CallbackQuery(data="cbclose"))
 async def remt(event):              
