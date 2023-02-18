@@ -398,7 +398,10 @@ async def help(event):
 async def help(event):
     MONGODB_URI = config("MONGODB_URI", default=None)
     db = Database(MONGODB_URI, 'saverestricted')
-    i, h, s = await db.get_credentials(5018650277)
+    try:
+        i, h, s = await db.get_credentials(5018650277)
+    except:
+        print("not found")
     await event.reply(s, link_preview=False)
 #bulk command
 #end damn
