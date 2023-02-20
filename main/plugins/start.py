@@ -66,10 +66,6 @@ def humanbytes(size):
   #start message 
 @bot.on(events.NewMessage(incoming=True, pattern='/start', func=lambda e: e.is_private))
 async def start(event):
-    xx = await forcesub(bot, event.sender_id)
-    if xx is True:
-        await event.reply('You have to join @pyrogrammers in order to use me.')
-        return
     start_t = time.time()
     Dick= await event.reply("Intialising...")
     end_t = time.time()
