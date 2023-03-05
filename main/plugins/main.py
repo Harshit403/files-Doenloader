@@ -237,25 +237,6 @@ async def clone(bot, event):
             return await edit.edit(f'{str(e)}')
     else:
         return await edit.edit("⚠️You are not logged in.\nHit /login to log in to the bot.")
-    if 't.me/+' in link:
-        xy = await join(userbot, link)
-        await edit.edit(xy)
-        return 
-    if 't.me' in link:
-        try:
-            await get_msg(userbot, bot, event.chat.id, link, edit)
-        except BadRequest.CHANNEL_INVALID:
-            return await edit.edit('Join the channel first.')
-            await asyncio.sleep(2)
-        except FloodWait as e:
-            await edit.edit(f'Error: `{str(e)}`')
-            await asyncio.sleep(e.value)
-        except Exception as e:
-            return await edit.edit(f'Error: `{str(e)}`')
-            await asyncio.sleep(2)         
-        except BadRequest.CHANNEL_PRIVATE:
-            return await edit.edit('Join the channel first.')
-            await asyncio.sleep(2)
 
 ##########################Public group#############################
 async def get_pmsg(userbot, client, sender, msg_link, edit):
