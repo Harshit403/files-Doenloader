@@ -207,6 +207,7 @@ async def clone(bot, event):
         try:
             await get_msg(bot, bot, event.chat.id, link, edit)
         except FloodWait as e:
+            return await edit.edit(f'Error: `{str(e)}`')
             await asyncio.sleep(e.value)
         except ValueError as v:
             return await edit.edit(f'`{str(v)}` Only message link allowed.\nMay be your message contains `?single` remove this word from your link and try again')
