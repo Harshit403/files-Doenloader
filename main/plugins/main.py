@@ -248,6 +248,7 @@ async def clone(bot, event):
             return await edit.edit('Join the channel first.')
             await asyncio.sleep(2)
         except FloodWait as e:
+            return await edit.edit(f'Error: `{str(e)}`')
             await asyncio.sleep(e.value)
         except Exception as e:
             return await edit.edit(f'Error: `{str(e)}`')
