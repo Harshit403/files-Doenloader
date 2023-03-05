@@ -380,7 +380,7 @@ async def clone(event):
     else:
         return await edit.edit("⚠️You are not logged in.\nHit /login to log in to the bot.")
 #end lmao
-    if 't.me' in link:
+    if 't.me' in link and not 't.me/c/' in link and not 't.me/+' in link:
         try:
             await get_pmsg(userbot, bot, event.chat.id, link, edit)
             await asyncio.sleep(15)
@@ -519,7 +519,7 @@ async def clone(event):
     else:
         return await edit.edit("⚠️You are not logged in.\nHit /login to log in to the bot.")
 #end lmao
-    if not 't.me' in link:
+    if 't.me' in link:
         try:
             await get_bot(userbot, bot, event.chat.id, link, edit, chat_id)
             await asyncio.sleep(15)
