@@ -149,7 +149,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             await edit.delete()
             await set_timer(client, sender, process, timer) 
         except Exception as e:
-            await edit.edit(F'ERROR: {str(e)}')
+            await edit.edit(F'ERROR.: {str(e)}')
             return 
     else:
         st, r = check_timer(sender, process, timer) 
@@ -336,7 +336,7 @@ async def get_pmsg(userbot, client, sender, msg_link, edit):
             await edit.delete()
             await set_timer(client, sender, process, timer) 
         except Exception as e:
-            await edit.edit(F'ERROR: {str(e)}')
+            await edit.edit(F'ERROR...: {str(e)}')
             return 
     else:
          await Bot.send_message(event.chat.id, "🥺 Something unexpected occurred, please let me know.") 
@@ -476,7 +476,7 @@ async def get_bot(userbot, client, sender, msg_link, edit, chat_id):
             await edit.delete()
             #await set_timer(client, sender, process, timer) 
         except Exception as e:
-            await edit.edit(F'ERROR: {str(e)}')
+            await edit.edit(F'ERROR....: {str(e)}')
             return 
     else:
          await Bot.send_message(event.chat.id, "🥺 Something unexpected occurred, please let me know.") 
