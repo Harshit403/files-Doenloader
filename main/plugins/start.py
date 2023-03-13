@@ -324,14 +324,15 @@ async def lin(event):
 #logout
 @bot.on(events.NewMessage(incoming=True, pattern="/logout", func=lambda e: e.is_private))
 async def out(event):
+    mf = await event.reply('🔄 fetching info...')
     xx = await db.is_logged(int(event.sender_id))
     if xx is True:
        await logout(event.sender_id)
        await db.lout(int(event.sender_id))
-       await event.reply('🔓Successfully Logged out.')
+       await mf.edit('🔓Successfully Logged out.')
     else:
         #await event.client.send_message(int(ACCESS), f'#IGNORE {str(e)}')
-        await event.reply(f"🔐 You are not logged in.")
+        await mf.edit(f"🔐 You are not logged in.")
 #logoit
 # callbacks
 @bot.on(events.callbackquery.CallbackQuery(data="cbdonate"))
