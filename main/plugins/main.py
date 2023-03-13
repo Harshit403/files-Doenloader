@@ -150,7 +150,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             await set_timer(client, sender, process, timer) 
         except Exception as e:
             if '400 CHANNEL_INVALID' in str(e):
-                await edit.edit(F'You haven't joined this channel yet, please join this channel first then send me message link to save.')
+                await edit.edit(F"You haven't joined this channel yet, please join this channel first then send me message link to save.")
             else:
                 await edit.edit(F'ERROR: {str(e)}')
                 return 
