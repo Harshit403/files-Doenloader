@@ -1,4 +1,10 @@
 #pyrogrammers
+#shit
+from hachoir.metadata import extractMetadata
+from hachoir.parser import createParser
+#end shit
+import os, time, asyncio, \
+    requests, shutil, random, logging
 from pyrogram.enums import MessageMediaType
 from .. import bot as Drone
 #from pyromod import listen
@@ -25,7 +31,7 @@ from telethon.tl.functions.channels import GetParticipantRequest
 #end
 from pyrogram.errors import FloodWait, BadRequest
 from pyrogram import Client, filters, idle
-from ethon.pyfunc import video_metadata
+#from ethon.pyfunc import video_metadata
 
 import re, time, asyncio, logging
 
@@ -115,8 +121,16 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                     path = str(file).split(".")[0] + ".mp4"
                     os.rename(file, path) 
                     file = str(file).split(".")[0] + ".mp4"
-                data = video_metadata(file)
-                duration = data["duration"]
+#                data = video_metadata(file)
+#                duration = data["duration"]
+#mffff
+                metadata = extractMetadata(createParser(file))
+                duration = 0
+                if metadata.has("duration"):
+                    duration = metadata.get('duration').seconds
+                width = 0
+                height = 0
+#mffff
                 thumb_path = await screenshot(file, duration/2, sender)
                 await client.send_video(
                     chat_id=sender,
@@ -309,8 +323,16 @@ async def get_pmsg(userbot, client, sender, msg_link, edit):
                     path = str(file).split(".")[0] + ".mp4"
                     os.rename(file, path) 
                     file = str(file).split(".")[0] + ".mp4"
-                data = video_metadata(file)
-                duration = data["duration"]
+#                data = video_metadata(file)
+#                duration = data["duration"]
+#mffff
+                metadata = extractMetadata(createParser(file))
+                duration = 0
+                if metadata.has("duration"):
+                    duration = metadata.get('duration').seconds
+                width = 0
+                height = 0
+#mffff
                 thumb_path = await screenshot(file, duration/2, sender)
                 await Bot.send_video(
                     chat_id=sender,
