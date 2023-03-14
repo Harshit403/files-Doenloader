@@ -222,11 +222,8 @@ async def clone(bot, event):
             return await edit.edit(f'Error: `{str(e)}`')
             await asyncio.sleep(e.value)
         except ValueError as v:
-            if '?single' in str(e):
-                await edit.edit(F"It is not possible to save this type of message using this free bot, Please remove last segment of your message (?single) and then send the link again.")
-            else:
-                return await edit.edit(f'`{str(v)}` Please send only message link, i can only save t.me types of links in free version.')
-                await asyncio.sleep(2)
+            return await edit.edit(f'`{str(v)}` Please send only message link, i can only save t.me types of links in free version.')
+            await asyncio.sleep(2)
         except Exception as e:
             return await edit.edit(f'Error: `{str(e)}`')   
             await asyncio.sleep(2)      
