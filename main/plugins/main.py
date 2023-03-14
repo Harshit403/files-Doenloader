@@ -212,8 +212,8 @@ async def clone(bot, event):
            return
     except TypeError:
         return
-#    if not await check_user(event.sender_id):
-#        return await event.reply(f"Hello {event.sender.first_name}, You have to join my channel in order to use.\n\nDue to overload only my channel subscribers can use me.", buttons=[Button.url("Join Channel", url="https://t.me/pyrogrammers")])
+    if not await check_user(event.chat.id):
+        return await event.reply(f"You have to join my channel in order to use.\n\nDue to overload only my channel subscribers can use me.", buttons=[Button.url("Join Channel", url="https://t.me/pyrogrammers")])
     edit = await event.reply("Initiating...")
     if 't.me' in link and not 't.me/c/' in link and not 't.me/+' in link:
         try:
