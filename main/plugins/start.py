@@ -24,7 +24,7 @@ import shutil, psutil
 from utils_bot import *
 #end
 from main.plugins.main import Bot, check_user
-from pyromod import listen 
+#from pyromod import listen 
 from main.plugins.helpers import login, logout
 from main.Database.database import Database
 #fucking login
