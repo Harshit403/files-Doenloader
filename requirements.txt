@@ -13,4 +13,3 @@ TgCrypto
 psutil
 wget
 gitpython
-pyromod 
