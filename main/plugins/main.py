@@ -356,8 +356,15 @@ async def get_pmsg(userbot, client, sender, msg_link, edit):
             await edit.delete()
             await set_timer(client, sender, process, timer) 
         except Exception as e:
-            await edit.edit(F'ERROR...: {str(e)}')
+            await edit.edit(F'ERROR: {str(e)}')
             return 
+        except FloodWait as f:
+            try: 
+                await get_pmsg(userbot, bot, sender, msg_link, edit)
+            except Exception as e:
+                print(e) 
+                return await edit.edit(f"Bot is limited by telegram for {f.value + 2} seconds.\nPlease wait until then or use @saverestrictedcontentsbot if working.")
+                await asyncio.sleep(f.value)
     else:
          await Bot.send_message(event.chat.id, "🥺 Something unexpected occurred, please let me know.") 
 
