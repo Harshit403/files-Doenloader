@@ -214,7 +214,13 @@ async def clone(bot, event):
         return
     if not await check_user(event.chat.id):
         return await event.reply(f"You have to join my channel in order to use.\n\nDue to overload only my channel subscribers can use me.", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Join Channel", url="https://t.me/pyrogrammers")]]),)
-    edit = await event.reply("Initiating...")
+    try:
+        edit = await event.reply("Initiating...")
+    except:
+        try:
+           edit = await bot.reply("Initiating...")
+         except:
+           edit = await Bot.reply("Initiating...")
     if 't.me' in link and not 't.me/c/' in link and not 't.me/+' in link:
         try:
             await get_msg(bot, bot, event.chat.id, link, edit)
