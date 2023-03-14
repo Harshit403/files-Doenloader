@@ -218,9 +218,9 @@ async def clone(bot, event):
         edit = await event.reply("Initiating...")
     except:
         try:
-           edit = await bot.reply("Initiating...")
-         except:
-           edit = await Bot.reply("Initiating...")
+            edit = await bot.reply("Initiating...")
+        except:
+            edit = await Bot.reply("Initiating...")
     if 't.me' in link and not 't.me/c/' in link and not 't.me/+' in link:
         try:
             await get_msg(bot, bot, event.chat.id, link, edit)
