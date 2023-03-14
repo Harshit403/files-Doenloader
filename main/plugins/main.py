@@ -64,7 +64,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             link_ = msg_link.split("?single")[0]
             msg_id = int(link_.split("/")[-1])
         else:
-            await client.edit_message_text(sender, edit_id, "🚫 Seems like you sent an unsupported message link.")
+            await edit.edit(f"🚫 Seems like you sent an unsupported message link.")
             return None
     if 't.me/c/' in msg_link:
         st, r = check_timer(sender, process, timer) 
