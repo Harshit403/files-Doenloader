@@ -2,6 +2,7 @@
 from pyrogram.enums import MessageMediaType
 from .. import bot as Drone
 from pyromod import listen
+from telethon import events, Button, errors, functions
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 #end
 from .. import bot
@@ -34,16 +35,19 @@ logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s'
 process=[]
 timer=[]
 
-#join check
+# join checks
 async def check_user(id):
     ok = True
     try:
-        await bot(GetParticipantRequest(channel='@pyrogrammers', participant=id))
+        await Drone(
+            functions.channels.GetParticipantRequest(
+                channel="pyrogrammers", participant=id
+            )
+        )
         ok = True
-    except UserNotParticipantError:
+    except errors.rpcerrorlist.UserNotParticipantError:
         ok = False
     return ok
-#end
 
 Bot = Client(
     "save-restricted-bot",
@@ -208,6 +212,8 @@ async def clone(bot, event):
            return
     except TypeError:
         return
+    if not await check_user(event.sender_id):
+        return await event.reply(f"Hello {event.sender.first_name}, You have to join my channel in order to use.\n\nDue to overload only my channel subscribers can use me.", buttons=[Button.url("Join Channel", url="https://t.me/pyrogrammers")])
     edit = await event.reply("Initiating...")
     if 't.me' in link and not 't.me/c/' in link and not 't.me/+' in link:
         try:
