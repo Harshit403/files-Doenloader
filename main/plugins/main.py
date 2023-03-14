@@ -56,7 +56,16 @@ errorC = """How fool is it?\nYou sent me invalid session string.\nHit /logout an
 
 async def get_msg(userbot, client, sender, msg_link, edit):
     chat = ""
-    msg_id = int(msg_link.split("/")[-1])
+    msg_id = 0
+    try:
+        msg_id = int(msg_link.split("/")[-1])
+    except ValueError:
+        if '?single' in msg_link:
+            link_ = msg_link.split("?single")[0]
+            msg_id = int(link_.split("/")[-1])
+        else:
+            await client.edit_message_text(sender, edit_id, "🚫 Seems like you sent an unsupported message link.")
+            return None
     if 't.me/c/' in msg_link:
         st, r = check_timer(sender, process, timer) 
         if st == False:
