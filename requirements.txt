@@ -13,3 +13,6 @@ TgCrypto
 psutil
 wget
 gitpython
+hachoir
+numpy
+Pillow
