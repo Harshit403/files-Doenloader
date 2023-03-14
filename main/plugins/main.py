@@ -208,11 +208,12 @@ async def clone(bot, event):
            return
     except TypeError:
         return
+"""
     xx = await forcesub(bot, event.chat.id)
     if xx is True:
         await event.reply('You have to join @pyrogrammers in order to use me.',reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Join Channel", url="https://t.me/pyrogrammers")]]),)
         return
-
+"""
     edit = await Bot.send_message(event.chat.id, "⏳")
     
     if 't.me' in link and not 't.me/c/' in link and not 't.me/+' in link:
@@ -221,15 +222,23 @@ async def clone(bot, event):
         except FloodWait as e:
             return await edit.edit(f'Error: `{str(e)}`')
             await asyncio.sleep(e.value)
-        except ValueError as v:
-            return await edit.edit(f'`{str(v)}` Please send only message link, i can only save t.me types of links in free version.')
+#        except ValueError as v:
+#            return await edit.edit(f'`{str(v)}` Please send only message link, i can only save t.me types of links in free version.')
             await asyncio.sleep(2)
         except Exception as e:
             return await edit.edit(f'Error: `{str(e)}`')   
             await asyncio.sleep(2)      
         except FloodWait as e:
             return await edit.edit(f"Bot is limited by telegram for {e.value + 2} seconds.\nPlease wait until then or use @saverestrictedcontentsbot if working.")
-
+#mfffff
+        except ValueError:
+            if '?single' in msg_link:
+                link_ = msg_link.split("?single")[0]
+                msg_id = int(link_.split("/")[-1])
+            else:
+                await client.edit_message_text(sender, edit_id, "🚫 Seems like you sent an unsupported message link.")
+                return None
+#mfffff
     userbot = ""
     MONGODB_URI = config("MONGODB_URI", default=None)
     db = Database(MONGODB_URI, 'saverestricted')
