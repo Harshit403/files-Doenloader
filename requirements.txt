@@ -1,4 +1,4 @@
-ethon
+
 python-decouple
 pyrogram
 telethon
