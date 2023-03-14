@@ -208,12 +208,7 @@ async def clone(bot, event):
            return
     except TypeError:
         return
-"""
-    xx = await forcesub(bot, event.chat.id)
-    if xx is True:
-        await event.reply('You have to join @pyrogrammers in order to use me.',reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Join Channel", url="https://t.me/pyrogrammers")]]),)
-        return
-"""
+
     edit = await Bot.send_message(event.chat.id, "⏳")
     
     if 't.me' in link and not 't.me/c/' in link and not 't.me/+' in link:
