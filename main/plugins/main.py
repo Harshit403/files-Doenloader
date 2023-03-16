@@ -233,7 +233,7 @@ async def clone(event):
     edit = await event.reply("Initiating...")
     if 't.me' in link and not 't.me/c/' in link and not 't.me/+' in link:
         try:
-            await get_msg(bot, bot, event.chat.id, link, edit)
+            await get_msg(bot, Bot, event.chat.id, link, edit)
         except FloodWait as e:
             return await edit.edit(f'Error: `{str(e)}`')
             await asyncio.sleep(e.value)
@@ -279,7 +279,7 @@ async def clone(event):
         return 
     if 't.me/c' in link:
         try:
-            await get_msg(userbot, bot, event.chat.id, link, edit)
+            await get_msg(userbot, Bot, event.chat.id, link, edit)
         except BadRequest.CHANNEL_INVALID:
             return await edit.edit('Join the channel first.')
             await asyncio.sleep(2)
