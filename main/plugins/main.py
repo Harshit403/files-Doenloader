@@ -3,6 +3,7 @@
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 #end shit
+import logging, time, sys
 import os, time, asyncio, \
     requests, shutil, random, logging
 from pyrogram.enums import MessageMediaType
