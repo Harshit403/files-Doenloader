@@ -62,6 +62,12 @@ Bot = Client(
     api_hash=API_HASH
 )
 
+try:
+    Bot.start()
+except Exception as e:
+    print(e)
+    sys.exit(1)
+
 errorC = """How fool is it?\nYou sent me invalid session string.\nHit /logout and /login again with valid pyrogram session string.Hit **Session Button** to generate session string."""
 
 async def get_msg(userbot, client, sender, msg_link, edit):
