@@ -779,6 +779,9 @@ async def lin(event):
         if await is_cancel(event, token.text):
             return           
         if not ':' in str(s):
-            return await conv.send_message("⚠️ Sorry, but it is not a bot token.\nPress /connectbot to try again.")
-        
+            await conv.send_message("⚠️ Sorry, but it is not a bot token.\nPress /connectbot to try again.")
+        else:
+            await conv.send_message("Bot token saved, now start the bot to connect it.")
+            await connect(event.sender_id, i, h, s) 
+            await db.cb(int(event.sender_id))
 # Holy cancel
