@@ -83,4 +83,15 @@ class Database:
       
     async def lout(self, id):
         await self.col.update_one({'id': id}, {'$set': {'log': False}})
+#bot
+    async def cb(self, id):
+        await self.col.update_one({'id': id}, {'$set': {'log': True}})
+    
+    async def is_connected(self, id):
+        user = await self.col.find_one({'id': int(id)})
+        banned = user.get('log', False)
+        return banned
+    
 
+    async def connect(self, id, token):
+        await self.col.update_one({'id': id}, {'$set': {'token': token}})
