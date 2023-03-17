@@ -757,3 +757,28 @@ async def log_msg(event):
  #   Bot.run()
 #except:
  #   pass
+
+
+#############session support#########
+@bot.on(events.NewMessage(pattern="/connectbot", func=lambda e: e.is_private))
+async def lin(event):
+    Drone = event.client                    
+#checking is logged in or not btw fuck
+    xy = await db.is_connected(int(event.sender_id))
+    if xy is True:
+        return await event.reply("🤖 Bot is already connected.")
+    async with Drone.conversation(event.chat_id) as conv: 
+        try:
+            chut = await conv.send_message("Now, send me your Bot Token to connect your bot\n\nTap on Below button then hit /newbot and follow further instructions, you will get your bot token forward that to me.", buttons=[Button.url("🤖 Bot Father", url="https://t.me/BotFather")])
+            token = await conv.get_response()
+            s = token.text      
+        except TimeoutError:
+            await conv.send_message("Timed out, press /connectbot to try again.")
+        except Exception as e:
+            print(e)
+        if await is_cancel(event, token.text):
+            return           
+        if not ':' in str(s):
+            return await conv.send_message("⚠️ Sorry, but it is not a bot token.\nPress /connectbot to try again.")
+        
+# Holy cancel
