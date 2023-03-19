@@ -400,14 +400,11 @@ async def get_pmsg(userbot, client, sender, msg_link, edit):
          await Bot.send_message(event.chat.id, "🥺 Something unexpected occurred, please let me know.") 
 
 
-@Drone.on(events.NewMessage(incoming=True, pattern='/public'))
+@Drone.on(events.NewMessage(incoming=True, pattern='/p'))
 async def clone(event):
-    Drone = event.client
-#motherfucker
-    async with Drone.conversation(event.chat_id) as conv: 
-#shit ask
-        await Bot.send_message(event.chat.id, "Send me the message link of public group.")
-        _link = await bot.get_response()
+    _link = event.pattern_match.group(1)
+    if not _link:
+        await event.reply("Wrong method!\n/p your_message_link")
         try:
             link = get_link(_link.text)
         except Exception:
