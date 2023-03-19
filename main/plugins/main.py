@@ -98,7 +98,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
         try:
             plient = Client(
             "save-retricted-bot",
-            bot_token=BOT_TOKEN,
+            bot_token=t,
             api_id=int(API_ID),
             api_hash=API_HASH)
         await plient.start()
