@@ -88,19 +88,41 @@ async def get_msg(userbot, client, sender, msg_link, edit):
         if st == False:
             return await edit.edit(r) 
         chat = int('-100' + str(msg_link.split("/")[-2]))
+#end####£######£##££###################################################
+#define userbot
+    plient = ""
+    MONGODB_URI = config("MONGODB_URI", default=None)
+    db = Database(MONGODB_URI, 'saverestricted')
+    i, h, t = await db.get_credentials(event.chat.id)
+    if i and h and t is not None:
+        try:
+            plient = Client(
+            "save-retricted-bot",
+            bot_token=BOT_TOKEN,
+            api_id=int(API_ID),
+            api_hash=API_HASH)
+        await plient.start()
+        except ValueError:
+            return await edit.edit("Your login cridentials are not valid, please /logout and /login again.")
+        except Exception as e:
+            print(e)
+            return await edit.edit(f'{str(e)}')
+    else:
+        return await edit.edit("⚠️You are not logged in.\nHit /login to log in to the bot.")
+#end lmao##################################################################################
         try:
             msg = await userbot.get_messages(chat, msg_id)
 ###########madharxgod
             if msg.media:
                 if msg.media == MessageMediaType.WEB_PAGE:
                     edit = await client.edit_message_text(sender, edit_id, "⚡")
-                    await client.send_message(sender, msg.text.markdown)
+                    await plient.send_message(sender, msg.text.markdown)
                     await edit.delete()
                     return
             if not msg.media:
                 if msg.text:
                     #edit = await client.edit_message_text(sender, edit_id, "⏳")
-                    await client.send_message(sender, msg.text.markdown)
+                    await plient.send_message(sender, msg.text.markdown)
                     await edit.delete()
                     return
                 if msg.empty or msg.service or msg.dice or msg.location:
@@ -108,7 +130,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                     return 
 ################madharchod
             edit = await edit.edit('Processing...')
-#end
+
             file = await userbot.download_media(
                 msg,
                 progress=progress_for_pyrogram,
@@ -139,7 +161,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                 height = 0
 #mffff
                 thumb_path = await screenshot(file, duration/2, sender)
-                await client.send_video(
+                await plient.send_video(
                     chat_id=sender,
                     video=file,
                     caption=caption,
@@ -164,11 +186,11 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                 
                 
                 await edit.edit("Uploading Audio File...")
-                await client.send_audio(sender, file, caption=caption)
+                await plient.send_audio(sender, file, caption=caption)
                 await edit.delete() 
                 await set_timer(client, sender, process, timer)
             else:
-                await client.send_document(
+                await plient.send_document(
                     sender,
                     file, 
                     caption=caption,
