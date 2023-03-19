@@ -108,7 +108,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             print(e)
             return await edit.edit(f'{str(e)}')
     else:
-        return await edit.edit("⚠️You are not logged in.\nHit /login to log in to the bot.")
+        return await edit.edit("⚠️You have to connect your bot in order to get files.\nHit /connectbot and follow further instructions")
 #end lmao##################################################################################
         try:
             msg = await userbot.get_messages(chat, msg_id)
@@ -217,7 +217,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             return await edit.delete()
         chat =  msg_link.split("/")[-2]
         try:
-            await client.copy_message(int(sender), chat, msg_id)
+            await plient.copy_message(int(sender), chat, msg_id)
             #text = "File has been copied to your saved messages.\nClick on Below Button."
             #reply_markup = InlineKeyboardMarkup(
             #[[InlineKeyboardButton(text="Show File", url=f"tg://openmessage?user_id={event.chat.id}")]]
