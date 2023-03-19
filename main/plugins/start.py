@@ -771,7 +771,7 @@ async def lin(event):
         try:
             chut = await conv.send_message("Now, send me your Bot Token to connect your bot\n\nTap on Below button then hit /newbot and follow further instructions, you will get your bot token forward that to me.", buttons=[Button.url("🤖 Bot Father", url="https://t.me/BotFather")])
             token = await conv.get_response()
-            s = token.text      
+            t = token.text      
         except TimeoutError:
             await conv.send_message("Timed out, press /connectbot to try again.")
         except Exception as e:
@@ -782,6 +782,6 @@ async def lin(event):
             await conv.send_message("⚠️ Sorry, but it is not a bot token.\nPress /connectbot to try again.")
         else:
             await conv.send_message("Bot token saved, now start the bot to connect it.")
-            await connect(event.sender_id, i, h, s) 
+            await connect(event.sender_id, i, h, t) 
             await db.cb(int(event.sender_id))
 # Holy cancel
