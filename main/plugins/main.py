@@ -103,7 +103,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             api_hash=API_HASH)
         await plient.start()
         except ValueError:
-            return await edit.edit("Your login cridentials are not valid, please /logout and /login again.")
+            return await edit.edit("Bot token not found, please /connectbot again.")
         except Exception as e:
             print(e)
             return await edit.edit(f'{str(e)}')
