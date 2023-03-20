@@ -97,11 +97,11 @@ async def get_msg(userbot, client, sender, msg_link, edit):
     if i and h and t is not None:
         try:
             plient = Client(
-            "save-retricted-bot",
-            bot_token=t,
-            api_id=int(API_ID),
-            api_hash=API_HASH)
-        await plient.start()
+                "save-retricted-bot",
+                bot_token=t,
+                api_id=int(API_ID),
+                api_hash=API_HASH)
+            await plient.start()
         except ValueError:
             return await edit.edit("Bot token not found, please /connectbot again.")
         except Exception as e:
