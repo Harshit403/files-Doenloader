@@ -70,29 +70,7 @@ except Exception as e:
     sys.exit(1)
 
 errorC = """How fool is it?\nYou sent me invalid session string.\nHit /logout and /login again with valid pyrogram session string.Hit **Session Button** to generate session string."""
-#end####£######£##££###################################################
-#define userbot
-    plient = ""
-    MONGODB_URI = config("MONGODB_URI", default=None)
-    db = Database(MONGODB_URI, 'saverestricted')
-    i, h, t = await db.get_credentials(event.chat.id)
-    if i and h and t is not None:
-        try:
-            #global plient
-            plient = Client(
-                "save-retricted-bot",
-                bot_token=t,
-                api_id=int(API_ID),
-                api_hash=API_HASH)
-            await plient.start()
-        except ValueError:
-            return await edit.edit("Bot token not found, please /connectbot again.")
-        except Exception as e:
-            print(e)
-            return await edit.edit(f'{str(e)}')
-    else:
-        return await edit.edit("⚠️You have to connect your bot in order to get files.\nHit /connectbot and follow further instructions")
-#end lmao##################################################################################
+
 async def get_msg(userbot, client, sender, msg_link, edit):
     chat = ""
     msg_id = 0
