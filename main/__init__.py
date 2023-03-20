@@ -1,6 +1,11 @@
 from telethon import TelegramClient
 from decouple import config
 import logging
+import logging, time, sys
+import os, time, asyncio, \
+    requests, shutil, random, logging
+from pyrogram import Client
+from main.Database.database import Database
 import time
 # heroku
 from heroku3 import from_key
@@ -26,3 +31,25 @@ API_KEY = config("API_KEY", None)
 HU_APP = from_key(API_KEY).apps()[APP_NAME]
 #end heroku 
 bot = TelegramClient('bot', API_ID, API_HASH).start(bot_token=BOT_TOKEN) 
+#end####£######£##££###################################################
+#define userbot
+plient = ""
+MONGODB_URI = config("MONGODB_URI", default=None)
+db = Database(MONGODB_URI, 'saverestricted')
+i, h, t = await db.get_credentials(event.chat.id)
+if i and h and t is not None:
+    try:
+       plient = Client(
+           "save-retricted-bot",
+            bot_token=t,
+            api_id=int(API_ID),
+            api_hash=API_HASH)
+        await plient.start()
+    except ValueError:
+        return await edit.edit("Bot token not found, please /connectbot again.")
+    except Exception as e:
+        print(e)
+        return await edit.edit(f'{str(e)}')
+else:
+     return await edit.edit("⚠️You have to connect your bot in order to get files.\nHit /connectbot and follow further instructions")
+#end lmao##################################################################################
