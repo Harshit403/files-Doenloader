@@ -205,7 +205,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             await set_timer(client, sender, process, timer)
         except FloodWait as f:
             try: 
-                await get_pmsg(userbot, bot, sender, msg_link, edit)
+                await get_msg(userbot, bot, sender, msg_link, edit)
             except Exception as e:
                 print(e) 
                 return await edit.edit(f"Bot is limited by telegram for {f.value + 2} seconds.\nPlease wait until then or use @saverestrictedcontentsbot if working.")
@@ -213,7 +213,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
         except Exception as e:
  #shit fuck code🤣
             if "empty" in {str(e)}:
-                await get_pmsg(userbot, bot, sender, msg_link, edit)
+                await get_msg(userbot, bot, sender, msg_link, edit)
             else:
 #fuck off slut
                 print(e)
@@ -309,7 +309,7 @@ async def clone(event):
         return 
     if 't.me/c' in link:
         try:
-            await get_msg(userbot, Bot, event.chat.id, link, edit)
+            await get_msg(userbot, plient, event.chat.id, link, edit)
         except BadRequest.CHANNEL_INVALID:
             return await edit.edit('Join the channel first.')
             await asyncio.sleep(2)
@@ -322,151 +322,3 @@ async def clone(event):
         except BadRequest.CHANNEL_PRIVATE:
             return await edit.edit('Join the channel first.')
             await asyncio.sleep(2)
-##########################Public group#############################
-async def get_pmsg(userbot, client, sender, msg_link, edit):
-    chat = ""
-    msg_id = int(msg_link.split("/")[-1])
-    if 't.me/' in msg_link and not 't.me/c' in msg_link:
-        #st, r = check_timer(sender, process, timer) 
-        #if st == False:
-            #return await edit.edit(r) 
-        chat =  msg_link.split("/")[-2]
-        try:
-            msg = await userbot.get_messages(chat, msg_id)
-
-            edit = await edit.edit('Processing...')
-#end
-            file = await userbot.download_media(
-                msg,
-                progress=progress_for_pyrogram,
-                progress_args=(
-                    userbot,
-                    "**Downloading:**\n",
-                    edit,
-                    time.time()
-                )
-            )
-            await edit.edit('UploadinG...')
-            caption = str(file)
-            if msg.caption is not None:
-                caption = msg.caption
-            if str(file).split(".")[-1] in ['mkv', 'mp4', 'webm']:
-                if str(file).split(".")[-1] in ['webm', 'mkv']:
-                    path = str(file).split(".")[0] + ".mp4"
-                    os.rename(file, path) 
-                    file = str(file).split(".")[0] + ".mp4"
-#                data = video_metadata(file)
-#                duration = data["duration"]
-#mffff
-                metadata = extractMetadata(createParser(file))
-                duration = 0
-                if metadata.has("duration"):
-                    duration = metadata.get('duration').seconds
-                width = 0
-                height = 0
-#mffff
-                thumb_path = await screenshot(file, duration/2, sender)
-                await Bot.send_video(
-                    chat_id=sender,
-                    video=file,
-                    caption=caption,
-                    supports_streaming=True,
-                    duration=duration,
-                    thumb=thumb_path,
-                    progress=progress_for_pyrogram,
-                    progress_args=(
-                        client,
-                        '**Uploading:**\n',
-                        edit,
-                        time.time()
-                    )
-                )
-            elif str(file).split(".")[-1] in ['jpg', 'jpeg', 'png', 'webp']:
-                await edit.edit("Uploading image file...")
-                await Bot.send_photo(sender, file, caption=caption)
-                await edit.delete()
-                await set_timer(client, sender, process, timer)
-                #for audio
-            elif str(file).split(".")[-1] in ['mp3', 'ogg', 'wav', 'm4a', 'Flac', 'AAC']:
-                
-                
-                await edit.edit("Uploading Audio File...")
-                await Bot.send_audio(sender, file, caption=caption)
-                await edit.delete() 
-                await set_timer(client, sender, process, timer)
-            else:
-                await Bot.send_document(
-                    sender,
-                    file, 
-                    caption=caption,
-                    progress=progress_for_pyrogram,
-                    progress_args=(
-                        client,
-                        '<b><u>Uploading...</b></u>\n',
-                        edit,
-                        time.time()
-                    )
-                )
-            await edit.delete()
-            await set_timer(client, sender, process, timer) 
-        except Exception as e:
-            await edit.edit(F'ERROR: {str(e)}')
-            return 
-        except FloodWait as f:
-            try: 
-                await get_pmsg(userbot, bot, sender, msg_link, edit)
-            except Exception as e:
-                print(e) 
-                return await edit.edit(f"Bot is limited by telegram for {f.value + 2} seconds.\nPlease wait until then or use @saverestrictedcontentsbot if working.")
-                await asyncio.sleep(f.value)
-    else:
-         await Bot.send_message(event.chat.id, "🥺 Something unexpected occurred, please let me know.") 
-
-
-@Drone.on(events.NewMessage(incoming=True, pattern='/p'))
-async def clone(event):
-    _link = event.pattern_match.group(1)
-    if not _link:
-        await event.reply("Wrong method!\n/p your_message_link")
-        try:
-            link = get_link(_link.text)
-        except Exception:
-            await Bot.send_message(event.chat.id, "No link found.")    
-            if not link:
-                return
-        edit = await Bot.send_message(event.chat.id, "Intialising...")
-
-        userbot = ""
-        MONGODB_URI = config("MONGODB_URI", default=None)
-        db = Database(MONGODB_URI, 'saverestricted')
-        i, h, s = await db.get_credentials(event.chat.id)
-        if i and h and s is not None:
-            try:
-                userbot = Client(
-                    name="saverestricted",
-                    session_string=s, 
-                    api_hash=h,
-                    api_id=int(i))
-                await userbot.start()
-            except ValueError:
-                return await edit.edit("Your login cridentials are not valid, please /logout and /login again.")
-            except Exception as e:
-                print(e)
-                return await edit.edit(f'{str(e)}')
-        else:
-             return await edit.edit("⚠️You are not logged in.\nHit /login to log in to the bot.")
-
-        if 't.me' in link and not 't.me/c/' in link and not 't.me/+' in link:
-            try:
-               await get_pmsg(userbot, bot, event.chat.id, link, edit)
-               await asyncio.sleep(15)
-            except FloodWait as e:
-                await asyncio.sleep(e.value)
-                return await edit.edit('FloodWait error, please try again later.')
-            except ValueError as v:
-                return await edit.edit(f'`{str(v)}`')
-                await asyncio.sleep(2)
-            except Exception as e:
-                return await edit.edit(f'Error: `{str(e)}`')
-                await asyncio.sleep(5)
-
