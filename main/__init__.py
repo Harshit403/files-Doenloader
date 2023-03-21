@@ -1,11 +1,6 @@
 from telethon import TelegramClient
 from decouple import config
 import logging
-import logging, time, sys
-import os, time, asyncio, \
-    requests, shutil, random, logging
-from pyrogram import Client
-from main.Database.database import Database
 import time
 # heroku
 from heroku3 import from_key
