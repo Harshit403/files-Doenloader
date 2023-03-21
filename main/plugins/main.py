@@ -94,13 +94,13 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             if msg.media:
                 if msg.media == MessageMediaType.WEB_PAGE:
                     edit = await client.edit_message_text(sender, edit_id, "⚡")
-                    await plient.send_message(sender, msg.text.markdown)
+                    await client.send_message(sender, msg.text.markdown)
                     await edit.delete()
                     return
             if not msg.media:
                 if msg.text:
                     #edit = await client.edit_message_text(sender, edit_id, "⏳")
-                    await plient.send_message(sender, msg.text.markdown)
+                    await client.send_message(sender, msg.text.markdown)
                     await edit.delete()
                     return
                 if msg.empty or msg.service or msg.dice or msg.location:
@@ -108,7 +108,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                     return 
 ################madharchod
             edit = await edit.edit('Processing...')
-
+#end
             file = await userbot.download_media(
                 msg,
                 progress=progress_for_pyrogram,
@@ -139,7 +139,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                 height = 0
 #mffff
                 thumb_path = await screenshot(file, duration/2, sender)
-                await plient.send_video(
+                await client.send_video(
                     chat_id=sender,
                     video=file,
                     caption=caption,
@@ -164,11 +164,11 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                 
                 
                 await edit.edit("Uploading Audio File...")
-                await plient.send_audio(sender, file, caption=caption)
+                await client.send_audio(sender, file, caption=caption)
                 await edit.delete() 
                 await set_timer(client, sender, process, timer)
             else:
-                await plient.send_document(
+                await client.send_document(
                     sender,
                     file, 
                     caption=caption,
@@ -195,7 +195,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             return await edit.delete()
         chat =  msg_link.split("/")[-2]
         try:
-            await plient.copy_message(int(sender), chat, msg_id)
+            await client.copy_message(int(sender), chat, msg_id)
             #text = "File has been copied to your saved messages.\nClick on Below Button."
             #reply_markup = InlineKeyboardMarkup(
             #[[InlineKeyboardButton(text="Show File", url=f"tg://openmessage?user_id={event.chat.id}")]]
@@ -400,57 +400,50 @@ async def get_pmsg(userbot, client, sender, msg_link, edit):
          await Bot.send_message(event.chat.id, "🥺 Something unexpected occurred, please let me know.") 
 
 
-@Drone.on(events.NewMessage(incoming=True, pattern='/public'))
+@Drone.on(events.NewMessage(incoming=True, pattern='/p'))
 async def clone(event):
-    await Bot.send_message(event.chat.id, "Send me the message link of public group.")
-    _link = await bot.get_response()
-    try:
-        link = get_link(_link.text)
-    except Exception:
-        await Bot.send_message(event.chat.id, "No link found.")
-        
-        if not link:
-            return
-       # except TypeError:
-            #return
-    #xx = await forcesub(bot, event.chat.id)
-    #if xx is True:
-       # await Bot.send_message(event.chat.id, 'You have to join @pyrogrammers in order to use me.',reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Join Channel", url="https://t.me/pyrogrammers")]]),)
-       # return
-    edit = await Bot.send_message(event.chat.id, "Intialising...")
-#define userbot
-    userbot = ""
-    MONGODB_URI = config("MONGODB_URI", default=None)
-    db = Database(MONGODB_URI, 'saverestricted')
-    i, h, s = await db.get_credentials(event.chat.id)
-    if i and h and s is not None:
+    _link = event.pattern_match.group(1)
+    if not _link:
+        await event.reply("Wrong method!\n/p your_message_link")
         try:
-            userbot = Client(
-                name="saverestricted",
-                session_string=s, 
-                api_hash=h,
-                api_id=int(i))
-            await userbot.start()
-        except ValueError:
-            return await edit.edit("Your login cridentials are not valid, please /logout and /login again.")
-        except Exception as e:
-            print(e)
-            return await edit.edit(f'{str(e)}')
-    else:
-        return await edit.edit("⚠️You are not logged in.\nHit /login to log in to the bot.")
-#end lmao
-    if 't.me' in link and not 't.me/c/' in link and not 't.me/+' in link:
-        try:
-            await get_pmsg(userbot, bot, event.chat.id, link, edit)
-            await asyncio.sleep(15)
-        except FloodWait as e:
-            await asyncio.sleep(e.value)
-#           return await edit.edit('FloodWait error, please try again later.')
-        except ValueError as v:
-            return await edit.edit(f'`{str(v)}`')
-            await asyncio.sleep(2)
-        except Exception as e:
-            return await edit.edit(f'Error: `{str(e)}`')
-            await asyncio.sleep(5)
+            link = get_link(_link.text)
+        except Exception:
+            await Bot.send_message(event.chat.id, "No link found.")    
+            if not link:
+                return
+        edit = await Bot.send_message(event.chat.id, "Intialising...")
 
+        userbot = ""
+        MONGODB_URI = config("MONGODB_URI", default=None)
+        db = Database(MONGODB_URI, 'saverestricted')
+        i, h, s = await db.get_credentials(event.chat.id)
+        if i and h and s is not None:
+            try:
+                userbot = Client(
+                    name="saverestricted",
+                    session_string=s, 
+                    api_hash=h,
+                    api_id=int(i))
+                await userbot.start()
+            except ValueError:
+                return await edit.edit("Your login cridentials are not valid, please /logout and /login again.")
+            except Exception as e:
+                print(e)
+                return await edit.edit(f'{str(e)}')
+        else:
+             return await edit.edit("⚠️You are not logged in.\nHit /login to log in to the bot.")
+
+        if 't.me' in link and not 't.me/c/' in link and not 't.me/+' in link:
+            try:
+               await get_pmsg(userbot, bot, event.chat.id, link, edit)
+               await asyncio.sleep(15)
+            except FloodWait as e:
+                await asyncio.sleep(e.value)
+                return await edit.edit('FloodWait error, please try again later.')
+            except ValueError as v:
+                return await edit.edit(f'`{str(v)}`')
+                await asyncio.sleep(2)
+            except Exception as e:
+                return await edit.edit(f'Error: `{str(e)}`')
+                await asyncio.sleep(5)
 
