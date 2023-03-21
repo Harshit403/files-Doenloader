@@ -293,7 +293,7 @@ async def clone(event):
                        api_id=int(i),
                        api_hash=h
                 )
-                await plient.start()
+            await plient.start()
             except ValueError:
                 return await edit.edit("Your bot token not found please /connectbot again.")
             except Exception as e:
