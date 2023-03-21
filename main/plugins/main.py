@@ -240,7 +240,7 @@ async def clone(event):
     edit = await event.reply("Initiating...")
     if 't.me' in link and not 't.me/c/' in link and not 't.me/+' in link:
         try:
-            await get_msg(bot, Bot, event.chat.id, link, edit)
+            await get_msg(bot, plient, event.chat.id, link, edit)
         except FloodWait as e:
             return await edit.edit(f'Error: `{str(e)}`')
             await asyncio.sleep(e.value)
@@ -280,6 +280,29 @@ async def clone(event):
             return await edit.edit(f'{str(e)}')
     else:
         return await edit.edit("⚠️You are not logged in.\nHit /login to log in to the bot.")
+#bot
+        plient = ""
+        MONGODB_URI = config("MONGODB_URI", default=None)
+        db = Database(MONGODB_URI, 'saverestricted')
+        i, h, t = await db.get_credentials(event.chat.id)
+        if i and h and t is not None:
+            try:
+                plient = Client(
+                       "save-restricted-bot",
+                       bot_token=t,
+                       api_id=int(i),
+                       api_hash=h
+                )
+                await plient.start()
+            except ValueError:
+                return await edit.edit("Your bot token not found please /connectbot again.")
+            except Exception as e:
+                print(e)
+                return await edit.edit(f'{str(e)}')
+        else:
+             return await edit.edit("Please /connectbot first.")
+
+#end bot 
     if 't.me/+' in link:
         xy = await join(userbot, link)
         await edit.edit(xy)
