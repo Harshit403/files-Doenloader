@@ -6,7 +6,7 @@ from hachoir.parser import createParser
 #end shit
 from pyrogram.enums import MessageMediaType
 from .. import bot as Drone
-£from pyromod import listen
+#from pyromod import listen
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from .. import bot, API_ID, API_HASH, BOT_TOKEN, FORCESUB, ACCESS
 import os
