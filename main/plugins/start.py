@@ -2,8 +2,6 @@ from asyncio.exceptions import TimeoutError
 from pyrogram import filters, Client, idle
 from pyrogram.types import Message
 import os
-from telethon import events, Button, errors, functions
-from main.plugins.helpers import forcesub, forcesub_text
 import requests
 import heroku3
 import sys
@@ -23,8 +21,8 @@ from pyrogram import Client
 import shutil, psutil
 from utils_bot import *
 #end
-from main.plugins.main import Bot, check_user
-#from pyromod import listen 
+from main.plugins.main import Bot
+from pyromod import listen 
 from main.plugins.helpers import login, logout
 from main.Database.database import Database
 #fucking login
@@ -45,7 +43,7 @@ Heroku = heroku3.from_key(API_KEY)
 async def is_heroku():
     return "heroku" in socket.getfqdn()
 #emd
-st = "Hii,\nI am @pyrogrammers save restricted contents bot, I can save messages of restricted channels.\n**Hit /help to learn more.**\n\n__You can get your own stable bot by contacing @Mich.__"
+st = "Hii,\nI am @pyrogrammers save restricted contents bot, I can save messages of restricted channels.\n**Hit /help to learn more.**"
 #define downloads
 downloads = os.path.realpath("main/downloads")
 raw = os.path.realpath(".")
@@ -100,9 +98,6 @@ async def start(event):
                         [Button.inline("💲 Donate", data="cbdonate"),
                          Button.inline("🗑️ Close", data="cbclose")]
                     ])
-        if not await check_user(event.sender_id):
-            return await Dick.edit(f"Hello {event.sender.first_name}, Due to overload only my channel subscribers can use me.\n\nPlease join my channel and then start me again!", buttons=[Button.url("Join Channel", url="https://t.me/pyrogrammers")])
-
 #end message 
     tag = f'[{event.sender.first_name}](tg://user?id={event.sender_id})'
     await event.client.send_message(int(ACCESS), f'#NEW_USER {tag} started the BOT\nUserID: {event.sender_id}') 
@@ -179,7 +174,7 @@ async def lin(event):
             if await is_cancel(event, x.text):
                 return
             try:
-                boobs = await conv.send_message("**Trying to send verification code on your telegram account.**\n\n\n`If you are facing issue while getting verification code please try alternative` (/session) `method.`")                    
+                boobs = await conv.send_message("**Trying to send verification code on your telegram account**\n\n\n`If you are facing issue while getting verification code please try alternative (/session) method.`")                    
                 if not phone:               
                     return await PN.edit("No response found.")
             except TimeoutError:
@@ -233,7 +228,7 @@ async def lin(event):
             return
         try:
             await boobs.delete()
-            otp = await conv.send_message("A verification code has been sent to your phone number, Please enter verification code in `1 2 3 4 5` format. __(Space between each numbers!)__", buttons=[Button.url("📲 View Code", url="https://t.me/+42777")])
+            otp = await conv.send_message("A verification code has been sent to your phone number, Please enter verification code in `1 2 3 4 5` format. __(Space between each numbers!)__")
             chut = await conv.get_response()
             otp_code = chut.text
             if await is_cancel(event, chut.text):
@@ -328,20 +323,19 @@ async def lin(event):
 #logout
 @bot.on(events.NewMessage(incoming=True, pattern="/logout", func=lambda e: e.is_private))
 async def out(event):
-    mf = await event.reply('🔄 fetching info...')
     xx = await db.is_logged(int(event.sender_id))
     if xx is True:
        await logout(event.sender_id)
        await db.lout(int(event.sender_id))
-       await mf.edit('🔓Successfully Logged out.')
+       await event.reply('🔓Successfully Logged out.')
     else:
         #await event.client.send_message(int(ACCESS), f'#IGNORE {str(e)}')
-        await mf.edit(f"🔐 You are not logged in.")
+        await event.reply(f"🔐 You are not logged in.")
 #logoit
 # callbacks
 @bot.on(events.callbackquery.CallbackQuery(data="cbdonate"))
 async def cbdonate(event):              
-    await event.edit("It's pleasure for me that you are donating me for all my efforts and work!\n\nUSDT [TETHER] (Network TRC20)\n`Not available`\n\nBTC [Bitcoin]\n`Not available`", buttons=[Button.url("Other Ways", url="https://telegram.me/MichaelPanther")])
+    await event.edit("It's pleasure for me that you are donating me for all my efforts and work!\n\nUSDT [TETHER] (Network TRC20)\n`TMbCbxLYCFjTEDaW4MAqamfKzb7XixxBir`\n\nBTC [Bitcoin]\n`bc1ql4fxwhkw7g7jl7g26kwpzlqf7kvjr8evrvv08s`", buttons=[Button.url("Other Ways", url="https://telegram.me/MichaelPanther")])
 
 @bot.on(events.callbackquery.CallbackQuery(data="cbclose"))
 async def remt(event):              
@@ -398,9 +392,6 @@ async def spb(event):
 async def help(event):
     await event.reply(ht, link_preview=False)
 #bulk command
-
-#bulk command
-#end damn
 @bot.on(events.NewMessage(pattern="^/bulk$", func=lambda e: e.is_private))
 async def search(event):
      user = await event.get_sender()
@@ -609,14 +600,9 @@ async def lin(event):
         h = API_HASH
         i = API_ID    
         #session = await Bot.ask(event.sender_id, "Now, send me your pyrogram session string to login to the bot\n\nYou can use below button to generate it.", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("⚙️ Generate Session", url="https://replit.com/@pyrogramers/Strsession?embed=true")]]),)  
-        try:
-            chut = await conv.send_message("Now, send me your pyrogram session string to login to the bot\n\nYou can use below button to generate it.", buttons=[Button.url("⚙️ Generate Session", url="https://replit.com/@pyrogramers/Strsession?embed=true")])
-            session = await conv.get_response()
-            s = session.text      
-        except TimeoutError:
-            await conv.send_message("Timed out, press /session to try again.")
-        except Exception as e:
-            print(e)
+        chut = await conv.send_message("Now, send me your pyrogram session string to login to the bot\n\nYou can use below button to generate it.", buttons=[Button.url("⚙️ Generate Session", url="https://replit.com/@pyrogramers/Strsession?embed=true")])
+        session = await conv.get_response()
+        s = session.text        
         if await is_cancel(event, session.text):
             return           
         if not len(s) >= 300:
@@ -757,28 +743,3 @@ async def log_msg(event):
  #   Bot.run()
 #except:
  #   pass
-
-
-#############session support#########
-@bot.on(events.NewMessage(pattern="/connectbot", func=lambda e: e.is_private))
-async def lin(event):
-    Drone = event.client                    
-#checking is logged in or not btw fuck
-    xy = await db.is_connected(int(event.sender_id))
-    if xy is True:
-        return await event.reply("🤖 Bot is already connected.")
-    async with Drone.conversation(event.chat_id) as conv: 
-        try:
-            chut = await conv.send_message("Now, send me your Bot Token to connect your bot\n\nTap on Below button then hit /newbot and follow further instructions, you will get your bot token forward that to me.", buttons=[Button.url("🤖 Bot Father", url="https://t.me/BotFather")])
-            token = await conv.get_response()
-            s = token.text      
-        except TimeoutError:
-            await conv.send_message("Timed out, press /connectbot to try again.")
-        except Exception as e:
-            print(e)
-        if await is_cancel(event, token.text):
-            return           
-        if not ':' in str(s):
-            return await conv.send_message("⚠️ Sorry, but it is not a bot token.\nPress /connectbot to try again.")
-        
-# Holy cancel
