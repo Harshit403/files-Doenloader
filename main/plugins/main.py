@@ -22,7 +22,7 @@ from telethon.tl.functions.channels import GetParticipantRequest
 #end
 from pyrogram.errors import FloodWait, BadRequest
 from pyrogram import Client, filters, idle
-from ethon.pyfunc import video_metadata
+#from ethon.pyfunc import video_metadata
 
 import re, time, asyncio, logging
 
