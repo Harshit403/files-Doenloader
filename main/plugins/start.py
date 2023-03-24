@@ -320,18 +320,17 @@ async def lin(event):
         except Exception as e:
             await conv.send_message(f"Error: `{str(e)}`.") 
         await client.disconnect()
-#logout
 @bot.on(events.NewMessage(incoming=True, pattern="/logout", func=lambda e: e.is_private))
 async def out(event):
+    mf = await event.reply('🔄 fetching info...')
     xx = await db.is_logged(int(event.sender_id))
     if xx is True:
        await logout(event.sender_id)
        await db.lout(int(event.sender_id))
-       await event.reply('🔓Successfully Logged out.')
+       await mf.edit('🔓Successfully Logged out.')
     else:
         #await event.client.send_message(int(ACCESS), f'#IGNORE {str(e)}')
-        await event.reply(f"🔐 You are not logged in.")
-#logoit
+        await mf.edit(f"🔐 You are not logged in.")
 # callbacks
 @bot.on(events.callbackquery.CallbackQuery(data="cbdonate"))
 async def cbdonate(event):              
@@ -400,6 +399,7 @@ async def search(event):
 #server
 @bot.on(events.NewMessage(pattern="^/server$", func=lambda e: e.is_private))
 async def stats(event):
+  xxx = await event.reply("🌐 Fetching server info...")
   currentTime = readable_time((time.time() - StartTime))
   total, used, free = shutil.disk_usage('.')
   total = get_readable_file_size(total)
@@ -419,7 +419,7 @@ async def stats(event):
             f'<b>CPU:</b> {cpuUsage}% ' \
             f'<b>RAM:</b> {memory}% ' \
             f'<b>Disk:</b> {disk}%'
-  await event.reply(botstats, parse_mode="HTML")
+  await xxx.edit(botstats, parse_mode="HTML")
 #end server
 #Reboot
   #reboot message 
@@ -607,16 +607,16 @@ async def lin(event):
             return           
         if not len(s) >= 300:
             return await conv.send_message("⚠️ Sorry, but it is not a session string.\nPress /session to try again.")
-        
+        xx = await conv.send_message("🔄 Logging in...")
         try:
             async with Client(name="saverestricted", session_string=s, api_hash=h, api_id=int(i)) as X:
               k = await X.get_me()
-              await conv.send_message(f"✅ Welcome {k.first_name}, You are Successfully logged in.\n\n🔗 Now send me your message link to download.")
+              await xx.edit(f"✅ Welcome {k.first_name}, You are Successfully logged in.\n\n🔗 Now send me your message link to download.")
               await login(event.sender_id, i, h, s) 
               await db.loin(int(event.sender_id))
         except Exception as e:
             print(e)
-            await conv.send_message("⚠️ Session string is Invalid.\nPress /session to try again.")
+            await xx.edit("⚠️ Session string is Invalid.\nPress /session to try again.")
 # Holy cancel
 async def is_cancel(event: Message, text: str):
     if text.startswith("/abort"):
