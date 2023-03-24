@@ -53,8 +53,16 @@ Bot = Client(
 errorC = """How fool is it?\nYou sent me invalid session string.\nHit /logout and /login again with valid pyrogram session string.Hit **Session Button** to generate session string."""
 
 async def get_msg(userbot, client, sender, msg_link, edit):
-    chat = ""
-    msg_id = int(msg_link.split("/")[-1])
+    msg_id = 0
+    try:
+        msg_id = int(msg_link.split("/")[-1])
+    except ValueError:
+        if '?single' in msg_link:
+            link_ = msg_link.split("?single")[0]
+            msg_id = int(link_.split("/")[-1])
+        else:
+            await edit.edit(f"🚫 Seems like you sent an unsupported link.")
+            return None
     if 't.me/c/' in msg_link:
         st, r = check_timer(sender, process, timer) 
         if st == False:
@@ -195,7 +203,7 @@ async def clone(bot, event):
     
     if 't.me' in link and not 't.me/c/' in link and not 't.me/+' in link:
         try:
-            await get_msg(bot, bot, event.chat.id, link, edit)
+            await get_msg(bot, Bot, event.chat.id, link, edit)
         except FloodWait as e:
             await asyncio.sleep(e.value)
         except ValueError as v:
@@ -230,7 +238,7 @@ async def clone(bot, event):
         xy = await join(userbot, link)
         await edit.edit(xy)
         return 
-    if 't.me' in link:
+    if 't.me/c' in link:
         try:
             await get_msg(userbot, bot, event.chat.id, link, edit)
         except BadRequest.CHANNEL_INVALID:
