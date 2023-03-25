@@ -5,7 +5,7 @@ from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 #end shit
 from pyrogram.enums import MessageMediaType
-from .. import bot as Drone
+from .. import bot as Drone, bot
 #from pyromod import listen
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from .. import bot, API_ID, API_HASH, BOT_TOKEN, FORCESUB, ACCESS
@@ -203,7 +203,7 @@ async def clone(bot, event):
     
     if 't.me' in link and not 't.me/c/' in link and not 't.me/+' in link:
         try:
-            await get_msg(bot, Bot, event.chat.id, link, edit)
+            await get_msg(bot, bot, event.chat.id, link, edit)
         except FloodWait as e:
             await asyncio.sleep(e.value)
         except ValueError as v:
