@@ -313,12 +313,13 @@ async def lin(event):
             await db.loin(int(event.sender_id)) 
         except Exception as e:
             await conv.send_message(f"Error: `{str(e)}`")
+        xx = await conv.send_message("🔄 Logging in...")
         await login(event.sender_id, i, h, s) 
         try:
             me = await client.get_me()
-            await conv.send_message(f"✅ Welcome {me.first_name},\nYou are Successfully logged in.\n\n🔗 Now send me your message link to save.")
+            await xx.edit(f"✅ Welcome {me.first_name},\nYou are Successfully logged in.\n\n🔗 Now send me your message link to save.")
         except Exception as e:
-            await conv.send_message(f"Error: `{str(e)}`.") 
+            await xx.edit(f"Error: `{str(e)}`.") 
         await client.disconnect()
 @bot.on(events.NewMessage(incoming=True, pattern="/logout", func=lambda e: e.is_private))
 async def out(event):
