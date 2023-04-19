@@ -13,6 +13,7 @@ import platform
 import math
 import re
 import uuid
+from telethon import Button, TelegramClient, events, functions, errors
 import socket
 from telethon import events, Button, TelegramClient
 from decouple import config
@@ -63,6 +64,22 @@ def humanbytes(size):
     return str(round(size, 2)) + " " + dict_power_n[raised_to_pow] + "B"
 #end
   #start message 
+#join checks 
+# join checks
+async def check_user(user):
+    ok = True
+    try:
+        await bot(
+            functions.channels.GetParticipantRequest(
+                channel="BotzHub", participant=user
+            )
+        )
+        ok = True
+    except errors.rpcerrorlist.UserNotParticipantError:
+        ok = False
+    return ok
+
+
 @bot.on(events.NewMessage(incoming=True, pattern='/start', func=lambda e: e.is_private))
 async def start(event):
     start_t = time.time()
@@ -98,6 +115,8 @@ async def start(event):
                         [Button.inline("💲 Donate", data="cbdonate"),
                          Button.inline("🗑️ Close", data="cbclose")]
                     ])
+        if not await check_user(event.sender_id):
+            return await Dick.edit(f"Hello {event.sender.first_name}, Due to overload only my channel subscribers can use me.\n\nPlease join my channel and then start me again!", buttons=[Button.url("Join Channel", url="https://t.me/pyrogrammers")])
 #end message 
     tag = f'[{event.sender.first_name}](tg://user?id={event.sender_id})'
     await event.client.send_message(int(ACCESS), f'#NEW_USER {tag} started the BOT\nUserID: {event.sender_id}') 
