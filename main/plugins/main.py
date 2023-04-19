@@ -188,19 +188,19 @@ async def get_msg(userbot, client, sender, msg_link, edit):
         
 @Bot.on_message(filters.private & filters.incoming)
 async def clone(bot, event):
+    if not await check_user(event.sender_id):
+        return await event.reply(f"Hello {event.sender.first_name}, Due to overload only my channel subscribers can use me.\n\nPlease join my channel and then start me again!", buttons=[Button.url("Join Channel", url="https://t.me/pyrogrammers")])
     try:
        link = get_link(event.text)
        if not link:
            return
     except TypeError:
         return
-    xx = await forcesub(bot, event.chat.id)
-    if xx is True:
-        await event.reply('You have to join @pyrogrammers in order to use me.',reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Join Channel", url="https://t.me/pyrogrammers")]]),)
-        return
-
+    #xx = await forcesub(bot, event.chat.id)
+    #if xx is True:
+        #await event.reply('You have to join @pyrogrammers in order to use me.',reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Join Channel", url="https://t.me/pyrogrammers")]]),)
+       # return
     edit = await Bot.send_message(event.chat.id, "⏳")
-    
     if 't.me' in link and not 't.me/c/' in link and not 't.me/+' in link:
         try:
             await get_msg(bot, bot, event.chat.id, link, edit)
