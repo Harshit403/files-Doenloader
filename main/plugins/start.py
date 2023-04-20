@@ -767,12 +767,12 @@ async def set_to(event):
             out = event.text.split(' ', 2)[1]
             await logout(out)
             await db.lout(int(out))
-            await x.edit(f'✅ Logged out {to}.')
+            await x.edit(f'✅ Logged out {out}.')
         except Exception as e:
             if 'out of' in str(e):
                 await event.reply('Usage: /out `users id`.')
             else:
-                await event.reply(f"Error: {e}.")  
+                await x.edit(f"Error: {e}.")  
 
 
 #try:
