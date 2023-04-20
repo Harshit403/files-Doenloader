@@ -763,10 +763,10 @@ async def log_msg(event):
 async def set_to(event):
     if 3 == 3:
         try:
-            x = await event.reply(f'✅ Logged out {to}.')
-            to = event.text.split(' ', 2)[1]
-            await logout(to)
-            await db.lout(int(to))
+            x = await event.reply('Trying to logging out...')
+            out = event.text.split(' ', 2)[1]
+            await logout(out)
+            await db.lout(int(out))
             await x.edit(f'✅ Logged out {to}.')
         except Exception as e:
             if 'out of' in str(e):
