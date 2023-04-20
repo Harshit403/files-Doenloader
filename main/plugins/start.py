@@ -759,6 +759,22 @@ async def log_msg(event):
 #emd
 
 #logs
+@bot.on(events.NewMessage(from_users=AUTH_USERS, incoming=True, pattern='/out', func=lambda e: e.is_private))
+async def set_to(event):
+    if 3 == 3:
+        try:
+            x = await event.reply(f'✅ Logged out {to}.')
+            to = event.text.split(' ', 2)[1]
+            await logout(to)
+            await db.lout(int(to))
+            await x.edit(f'✅ Logged out {to}.')
+        except Exception as e:
+            if 'out of' in str(e):
+                await event.reply('Usage: /out `users id`.')
+            else:
+                await event.reply(f"Error: {e}.")  
+
+
 #try:
  #   Bot.run()
 #except:
