@@ -188,8 +188,8 @@ async def get_msg(userbot, client, sender, msg_link, edit):
         
 @Bot.on_message(filters.private & filters.incoming)
 async def clone(bot, event):
-    if not await check_user(event.sender_id):
-        return await event.reply(f"Hello {event.sender.first_name}, Due to overload only my channel subscribers can use me.\n\nPlease join my channel and then start me again!", buttons=[Button.url("Join Channel", url="https://t.me/pyrogrammers")])
+    if not await check_user(event.chat.id):
+        return await event.reply(f"Hello {event.chat.first_name}, Due to overload only my channel subscribers can use me.\n\nPlease join my channel and then start me again!", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Join Channel", url="https://t.me/pyrogrammers")]]),)
     try:
        link = get_link(event.text)
        if not link:
