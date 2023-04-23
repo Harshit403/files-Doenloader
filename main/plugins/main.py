@@ -169,7 +169,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                 await get_pmsg(userbot, bot, sender, msg_link, edit)
             except Exception as e:
                 print(e) 
-                return await edit.edit(f"Bot is limited by telegram for {f.value + 2} seconds.\nPlease wait until then or use @saverestrictedcontentsbot if working.")
+                return await edit.edit(f"Bot is limited by telegram for {f.value + 2} seconds.\nPlease wait until then or upgrade to premium plan by contacting @pyro_owner to remove these limitations.")
                 await asyncio.sleep(f.value)
         except Exception as e:
  #shit fuck code🤣
@@ -214,7 +214,7 @@ async def clone(bot, event):
             return await edit.edit(f'Error: `{str(e)}`')   
             await asyncio.sleep(2)      
         except FloodWait as e:
-            return await edit.edit(f"Bot is limited by telegram for {e.value + 2} seconds.\nPlease wait until then or use @saverestrictedcontentsbot if working.")
+            return await edit.edit(f"Bot is limited by telegram for {e.value + 2} seconds.\nPlease wait until then or upgrade to premium plan by contacting @pyro_owner to remove these limitations. ")
 
     userbot = ""
     MONGODB_URI = config("MONGODB_URI", default=None)
@@ -224,7 +224,7 @@ async def clone(bot, event):
         try:
             userbot = Client(
                 name="saverestricted",
-                session_string=s, 
+                session_string=s,
                 api_hash=h,
                 api_id=int(i))
             await userbot.start()
