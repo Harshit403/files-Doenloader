@@ -79,8 +79,8 @@ async def set_timer(bot, sender, list1, list2):
     now = time.time()
     list2.append(f'{now}')
     list1.append(f'{sender}')
-    await bot.send_message(sender, 'You can start a new process again after 5 minutes.\n__Contact @pyro_owner to remove this time gap at cheap rate.__')
-    await asyncio.sleep(300)
+    await bot.send_message(sender, 'You can start a new process again after 11 minutes.\n__To overcome these limitations, please contact [@Pyro_owner](https://t.me/pyro_owner) to upgrade to the Premium Plan.__')
+    await asyncio.sleep(660)
     list2.pop(int(list2.index(f'{now}')))
     list1.pop(int(list1.index(f'{sender}')))
     
@@ -90,7 +90,7 @@ def check_timer(sender, list1, list2):
         index = list1.index(f'{sender}')
         last = list2[int(index)]
         present = time.time()
-        return False, f"Please wait {300-round(present-float(last))} seconds to get next message.\n__Contact @pyro_owner to remove this time gap at cheap rate.__"
+        return False, f"Please wait {660-round(present-float(last))} seconds to get next message.\n__To overcome these limitations, please contact [@Pyro_owner](https://t.me/pyro_owner) to upgrade to the Premium Plan.__"
     else:
         return True, None
 
