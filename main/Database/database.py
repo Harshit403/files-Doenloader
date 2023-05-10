@@ -92,3 +92,7 @@ class Database:
         user = await self.col.find_one({'id': int(id)})
         banned = user.get('log', False)
         return banned
+
+
+    async def update_token(self, id, token):
+        await self.col.update_one({'id': id}, {'$set': {'token': token}})
