@@ -44,7 +44,7 @@ Heroku = heroku3.from_key(API_KEY)
 async def is_heroku():
     return "heroku" in socket.getfqdn()
 #emd
-st = "Hii,\nI am @pyrogrammers save restricted contents bot, I can save messages of restricted channels.\n**Hit /help to learn more.**"
+st = "Hii,\nI am save restricted contents premium bot, I can save messages of restricted channels.\n**Hit /help to learn more.**"
 #define downloads
 downloads = os.path.realpath("main/downloads")
 raw = os.path.realpath(".")
@@ -413,8 +413,8 @@ async def help(event):
 #bulk command
 @bot.on(events.NewMessage(pattern="^/bulk$", func=lambda e: e.is_private))
 async def search(event):
-     user = await event.get_sender()
-     await event.reply("**Available Offers**\n\n1.For 1 day 👉 $3\n\n2.1 week 👉 $6\n\n3.1 months 👉 $12\n\n**Payment Mode:- Paypal, UPI, BTC, Amazon Gift Card**\n\n__If you want to subscribe premium feature please contact me using below button.__", buttons=[Button.url("Contact", url="https://telegram.me/pyro_owner")])
+#     user = await event.get_sender()
+#     await event.reply("**Available Offers**\n\n1.For 1 day 👉 $3\n\n2.1 week 👉 $6\n\n3.1 months 👉 $12\n\n**Payment Mode:- Paypal, UPI, BTC, Amazon Gift Card**\n\n__If you want to subscribe premium feature please contact me using below button.__", buttons=[Button.url("Contact", url="https://telegram.me/pyro_owner")])
 #end bulk Message
 #server
 @bot.on(events.NewMessage(pattern="^/server$", func=lambda e: e.is_private))
