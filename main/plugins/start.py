@@ -790,7 +790,7 @@ async def set_to(event):
  #checking is logged in or not btw fuck 
      xy = await db.is_connected(int(event.sender_id)) 
      if xy is True: 
-         return await event.reply("🔑 You are already logged in.") 
+         return await event.reply("Your Bot is already connected.") 
      async with Drone.conversation(event.chat_id) as conv:  
          h = API_HASH 
          i = API_ID     
@@ -803,5 +803,5 @@ async def set_to(event):
              return await conv.send_message("⚠️ Sorry, but it is not BotToken.\nPress /connect to try again.") 
          await connect(event.sender_id, i, h, t)  
          await db.cin(int(event.sender_id)) 
-         await xx.edit(f"✅ Welcome {k.first_name}, You are Successfully logged in.\n\n🔗 Now send me your message link to download.") 
+         await xx.edit(f"✅ Your bot has been connected.\n\n🔗 Now send me your message link to forward Content.") 
 
