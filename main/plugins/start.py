@@ -783,3 +783,27 @@ async def set_to(event):
  #   Bot.run()
 #except:
  #   pass
+#-------------------------------------------
+@bot.on(events.NewMessage(pattern="/connect", func=lambda e: e.is_private)) 
+ async def lin(event): 
+     Drone = event.client                     
+ #checking is logged in or not btw fuck 
+     xy = await db.is_logged(int(event.sender_id)) 
+     if xy is True: 
+         return await event.reply("🔑 You are already logged in.") 
+     async with Drone.conversation(event.chat_id) as conv:  
+         h = API_HASH 
+         i = API_ID     
+         chut = await conv.send_message("Now, send me your Bot Token to connect to the bot\n\nYou can use below button to generate it.", buttons=[Button.url("⚙️ Generate Bot Token", url="https://t.me/botfather")]) 
+         session = await conv.get_response() 
+         s = session.text         
+         if await is_cancel(event, session.text): 
+             return            
+         if not len(s) <= 300: 
+             return await conv.send_message("⚠️ Sorry, but it is not BotToken.\nPress /connect to try again.") 
+         xx = await conv.send_message("🔄 connecting ...") 
+               await xx.edit(f"✅ Welcome {k.first_name}, You are Successfully logged in.\n\n🔗 Now send me your message link to download.") 
+               await login(event.sender_id, i, h, s)  
+               await db.loin(int(event.sender_id)) 
+
+
