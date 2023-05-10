@@ -12,6 +12,8 @@ logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s'
 API_ID = config("API_ID", default=None, cast=int)
 API_HASH = config("API_HASH", default=None)
 BOT_TOKEN = config("BOT_TOKEN", default=None)
+BOT_TOKEN2 = config("BOT_TOKEN", default=None)
+BOT_TOKEN3 = config("BOT_TOKEN", default=None)
 FORCESUB = config("FORCESUB", default=None, cast=int)
 ACCESS = config("ACCESS", default=None, cast=int)
 MONGODB_URI = config("MONGODB_URI", default=None)
