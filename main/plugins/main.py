@@ -156,8 +156,8 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             return await edit.edit(f"Bot is limited by telegram for {f.value + 2} seconds.\nPlease wait until then or upgrade to premium plan by contacting @pyro_owner to remove these limitations.")
             await asyncio.sleep(f.value)
         except Exception as e:
-                print(e)
-                return await edit.edit(sender, f'{str(e)}')
+            print(e)
+            return await edit.edit(sender, f'{str(e)}')
         except BadRequest.CHANNEL_INVALID:
             return await edit.edit('Your Channel is unavailable.')
         except BadRequest.CHANNEL_PRIVATE:
