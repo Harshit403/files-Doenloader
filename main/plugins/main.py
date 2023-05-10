@@ -130,7 +130,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                 await edit.edit("Uploading Audio File...")
                 await client.send_audio(sender, file, caption=caption)
                 await edit.delete() 
-                "await set_timer(client, sender, process, timer)
+                await set_timer(client, sender, process, timer)
             else:
                 await client.send_document(
                     sender,
