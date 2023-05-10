@@ -802,8 +802,8 @@ async def set_to(event):
          if not len(s) <= 300: 
              return await conv.send_message("⚠️ Sorry, but it is not BotToken.\nPress /connect to try again.") 
          xx = await conv.send_message("🔄 connecting ...") 
-               await xx.edit(f"✅ Welcome {k.first_name}, You are Successfully logged in.\n\n🔗 Now send me your message link to download.") 
-               await login(event.sender_id, i, h, s)  
-               await db.loin(int(event.sender_id)) 
+              await xx.edit(f"✅ Welcome {k.first_name}, You are Successfully logged in.\n\n🔗 Now send me your message link to download.") 
+              await login(event.sender_id, i, h, s)  
+              await db.loin(int(event.sender_id)) 
 
 
