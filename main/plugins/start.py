@@ -788,7 +788,7 @@ async def set_to(event):
  async def lin(event): 
      Drone = event.client                     
  #checking is logged in or not btw fuck 
-     xy = await db.is_logged(int(event.sender_id)) 
+     xy = await db.is_connected(int(event.sender_id)) 
      if xy is True: 
          return await event.reply("🔑 You are already logged in.") 
      async with Drone.conversation(event.chat_id) as conv:  
@@ -801,7 +801,7 @@ async def set_to(event):
              return            
          if not len(s) <= 300: 
              return await conv.send_message("⚠️ Sorry, but it is not BotToken.\nPress /connect to try again.") 
-         await login(event.sender_id, i, h, t)  
+         await connect(event.sender_id, i, h, t)  
          await db.cin(int(event.sender_id)) 
          await xx.edit(f"✅ Welcome {k.first_name}, You are Successfully logged in.\n\n🔗 Now send me your message link to download.") 
 
