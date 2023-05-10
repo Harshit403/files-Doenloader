@@ -193,15 +193,10 @@ async def clone(bot, event):
     if i and h and t is not None:
         try:
             hsb = Client(
-
                 "save-restricted-bot",
-
                  bot_token=t,
-
                  api_id=int(i),
-
                  api_hash=h
-
             )
             await hsb.start()
         except ValueError:
@@ -213,7 +208,6 @@ async def clone(bot, event):
     else:
         return await edit.edit("⚠️plesse connect your bot.\nHit /bin to connect your bot.")
 #############################
-
     userbot = ""
     MONGODB_URI = config("MONGODB_URI", default=None)
     db = Database(MONGODB_URI, 'saverestricted')
@@ -253,29 +247,17 @@ async def clone(bot, event):
             await asyncio.sleep(2)
 
     if 't.me' in link and not 't.me/c/' in link and not 't.me/+' in link:
-
         try:
-
             await get_msg(hsb, hsb, event.chat.id, link, edit)
-
         except FloodWait as e:
-
             await asyncio.sleep(e.value)
-
         except ValueError as v:
-
             return await edit.edit(f'`{str(v)}` Only message link allowed.\nMay be your message contains `?single` remove this word from your link and try again')
-
             await asyncio.sleep(2)
-
         except Exception as e:
-
             return await edit.edit(f'Error: `{str(e)}`')   
-
             await asyncio.sleep(2)      
-
         except FloodWait as e:
-
             return await edit.edit(f"Bot is limited by telegram for {e.value + 2} seconds.\nPlease wait until then or upgrade to premium plan by contacting @pyro_owner to remove these limitations. ")
 
     
