@@ -32,16 +32,7 @@ logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s'
 process=[]
 timer=[]
 
-#join check
-async def check_user(id):
-    ok = True
-    try:
-        await bot(GetParticipantRequest(channel='@pyrogrammers', participant=id))
-        ok = True
-    except UserNotParticipantError:
-        ok = False
-    return ok
-#end
+
 
 Bot = Client(
     "save-restricted-bot",
