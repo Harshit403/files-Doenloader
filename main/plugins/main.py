@@ -153,8 +153,8 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             await set_timer(client, sender, process, timer)
         except FloodWait as f:
             print(e) 
-                return await edit.edit(f"Bot is limited by telegram for {f.value + 2} seconds.\nPlease wait until then or upgrade to premium plan by contacting @pyro_owner to remove these limitations.")
-                await asyncio.sleep(f.value)
+            return await edit.edit(f"Bot is limited by telegram for {f.value + 2} seconds.\nPlease wait until then or upgrade to premium plan by contacting @pyro_owner to remove these limitations.")
+            await asyncio.sleep(f.value)
         except Exception as e:
  #shit fuck code🤣
             if "empty" in {str(e)}:
