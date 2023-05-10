@@ -152,10 +152,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             await edit.delete()
             await set_timer(client, sender, process, timer)
         except FloodWait as f:
-            try: 
-                await get_pmsg(userbot, bot, sender, msg_link, edit)
-            except Exception as e:
-                print(e) 
+            print(e) 
                 return await edit.edit(f"Bot is limited by telegram for {f.value + 2} seconds.\nPlease wait until then or upgrade to premium plan by contacting @pyro_owner to remove these limitations.")
                 await asyncio.sleep(f.value)
         except Exception as e:
