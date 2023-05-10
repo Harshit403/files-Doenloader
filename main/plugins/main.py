@@ -189,7 +189,7 @@ async def clone(bot, event):
     hsb = ""
     MONGODB_URI = config("MONGODB_URI", default=None)
     db = Database(MONGODB_URI, 'saverestricted')
-    i, h, t = await db.get_credentials(event.chat.id)
+    i, h, t = await db.get_token(event.chat.id)
     if i and h and t is not None:
         try:
             hsb = Client(
