@@ -24,7 +24,7 @@ from utils_bot import *
 #end
 from main.plugins.main import Bot
 #from pyromod import listen 
-from main.plugins.helpers import login, logout
+from main.plugins.helpers import login, logout, connect
 from main.Database.database import Database
 #fucking login
 from pyrogram.errors import (
