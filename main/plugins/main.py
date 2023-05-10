@@ -148,11 +148,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
         chat =  msg_link.split("/")[-2]
         try:
             await client.copy_message(int(sender), chat, msg_id)
-            #text = "File has been copied to your saved messages.\nClick on Below Button."
-            #reply_markup = InlineKeyboardMarkup(
-            #[[InlineKeyboardButton(text="Show File", url=f"tg://openmessage?user_id={event.chat.id}")]]
-            #)
-            #await client.reply(event.chat.id, text, reply_markup=reply_markup)
+
             await edit.delete()
             await set_timer(client, sender, process, timer)
         except FloodWait as f:
@@ -185,10 +181,7 @@ async def clone(bot, event):
            return
     except TypeError:
         return
-    #xx = await forcesub(bot, event.chat.id)
-    #if xx is True:
-        #await event.reply('You have to join @pyrogrammers in order to use me.',reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Join Channel", url="https://t.me/pyrogrammers")]]),)
-       # return
+
     edit = await Bot.send_message(event.chat.id, "⏳")
     if not await check_user(event.chat.id):
         return await edit.edit(f"Hello {event.chat.first_name}, Due to overload only my channel subscribers can use me.\n\nPlease join my channel and then start me again!", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Join Channel", url="https://t.me/pyrogrammers")]]),)
