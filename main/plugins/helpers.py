@@ -26,7 +26,7 @@ async def connect(sender, i, h, t):
     db = Database(MONGODB_URI, 'saverestricted')
     await db.update_api_id(sender, i)
     await db.update_api_hash(sender, h)
-    await db.update_session(sender, t)
+    await db.update_token(sender, t)
 
 async def logout(sender):
     MONGODB_URI = config("MONGODB_URI", default=None)
