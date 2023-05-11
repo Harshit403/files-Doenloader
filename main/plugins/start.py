@@ -794,7 +794,7 @@ async def lin(event):
         t = token.text         
         if await is_cancel(event, token.text): 
             return            
-        if not len(s) <= 300: 
+        if not len(t) <= 300: 
             return await conv.send_message("⚠️ Sorry, but it is not BotToken.\nPress /connect to try again.") 
         await connect(event.sender_id, i, h, t)  
         await db.cin(int(event.sender_id)) 
