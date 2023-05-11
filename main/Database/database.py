@@ -69,7 +69,8 @@ class Database:
         i = user.get('api_id', None)
         h = user.get('api_hash', None)
         s = user.get('session', None)
-        return i, h, s 
+        t = user.get('token', None)
+        return i, h, s, t
 
     async def loin(self, id):
         await self.col.update_one({'id': id}, {'$set': {'log': True}})
@@ -91,13 +92,5 @@ class Database:
         banned = user.get('log', False)
         return banned
 
-
     async def update_token(self, id, token):
         await self.col.update_one({'id': id}, {'$set': {'token': token}})
-
-    async def get_token(self, id):
-        user = await self.col.find_one({'id':int(id)})
-        i = user.get('api_id', None)
-        h = user.get('api_hash', None)
-        t = user.get('token', None)
-        return i, h, t
