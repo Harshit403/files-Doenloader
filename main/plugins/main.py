@@ -202,20 +202,7 @@ async def clone(bot, event):
     if not await check_user(event.chat.id):
         return await edit.edit(f"Hello {event.chat.first_name}, Due to overload only my channel subscribers can use me.\n\nPlease join my channel and then start me again!", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Join Channel", url="https://t.me/pyrogrammers")]]),)
 
-    if 't.me' in link and not 't.me/c/' in link and not 't.me/+' in link:
-        try:
-            await get_msg(bot, bot, event.chat.id, link, edit)
-        except FloodWait as e:
-            await asyncio.sleep(e.value)
-        except ValueError as v:
-            return await edit.edit(f'`{str(v)}` Only message link allowed.\nMay be your message contains `?single` remove this word from your link and try again')
-            await asyncio.sleep(2)
-        except Exception as e:
-            return await edit.edit(f'Error: `{str(e)}`')   
-            await asyncio.sleep(2)      
-        except FloodWait as e:
-            return await edit.edit(f"Bot is limited by telegram for {e.value + 2} seconds.\nPlease wait until then or upgrade to premium plan by contacting @pyro_owner to remove these limitations. ")
-
+ 
     userbot = ""
     MONGODB_URI = config("MONGODB_URI", default=None)
     db = Database(MONGODB_URI, 'saverestricted')
@@ -254,101 +241,20 @@ async def clone(bot, event):
             return await edit.edit('Join the channel first.')
             await asyncio.sleep(2)
 
-##########################Public group#############################
-async def get_pmsg(userbot, client, sender, msg_link, edit):
-    chat = ""
-    msg_id = int(msg_link.split("/")[-1])
-    if 't.me/' in msg_link and not 't.me/c' in msg_link:
-        #st, r = check_timer(sender, process, timer) 
-        #if st == False:
-            #return await edit.edit(r) 
-        chat =  msg_link.split("/")[-2]
+
+   if 't.me' in link and not 't.me/c/' in link and not 't.me/+' in link:
         try:
-            msg = await userbot.get_messages(chat, msg_id)
-
-            edit = await edit.edit('Processing...')
-#end
-            file = await userbot.download_media(
-                msg,
-                progress=progress_for_pyrogram,
-                progress_args=(
-                    userbot,
-                    "**Downloading:**\n",
-                    edit,
-                    time.time()
-                )
-            )
-            await edit.edit('UploadinG...')
-            caption = str(file)
-            if msg.caption is not None:
-                caption = msg.caption
-            if str(file).split(".")[-1] in ['mkv', 'mp4', 'webm']:
-                if str(file).split(".")[-1] in ['webm', 'mkv']:
-                    path = str(file).split(".")[0] + ".mp4"
-                    os.rename(file, path) 
-                    file = str(file).split(".")[0] + ".mp4"
-                #data = video_metadata(file)
-                #duration = data["duration"]
-#mffff
-                metadata = extractMetadata(createParser(file))
-                duration = 0
-                if metadata.has("duration"):
-                    duration = metadata.get('duration').seconds
-                width = 0
-                height = 0
-#mffff
-                thumb_path = await screenshot(file, duration/2, sender)
-                await Bot.send_video(
-                    chat_id=sender,
-                    video=file,
-                    caption=caption,
-                    supports_streaming=True,
-                    duration=duration,
-                    thumb=thumb_path,
-                    progress=progress_for_pyrogram,
-                    progress_args=(
-                        client,
-                        '**Uploading:**\n',
-                        edit,
-                        time.time()
-                    )
-                )
-            elif str(file).split(".")[-1] in ['jpg', 'jpeg', 'png', 'webp']:
-                await edit.edit("Uploading image file...")
-                await Bot.send_photo(sender, file, caption=caption)
-                await edit.delete()
-                await set_timer(client, sender, process, timer)
-                #for audio
-            elif str(file).split(".")[-1] in ['mp3', 'ogg', 'wav', 'm4a', 'Flac', 'AAC']:
-                
-                
-                await edit.edit("Uploading Audio File...")
-                await Bot.send_audio(sender, file, caption=caption)
-                await edit.delete() 
-                await set_timer(client, sender, process, timer)
-            else:
-                await Bot.send_document(
-                    sender,
-                    file, 
-                    caption=caption,
-                    progress=progress_for_pyrogram,
-                    progress_args=(
-                        client,
-                        '<b><u>Uploading...</b></u>\n',
-                        edit,
-                        time.time()
-                    )
-                )
-            await edit.delete()
-            await set_timer(client, sender, process, timer) 
+            await get_msg(bot, bot, event.chat.id, link, edit)
+        except FloodWait as e:
+            await asyncio.sleep(e.value)
+        except ValueError as v:
+            return await edit.edit(f'`{str(v)}` Only message link allowed.\nMay be your message contains `?single` remove this word from your link and try again')
+            await asyncio.sleep(2)
         except Exception as e:
-            await edit.edit(F'ERROR: {str(e)}')
-            return 
-    else:
-         await Bot.send_message(event.chat.id, "🥺 Something unexpected occurred, please let me know.") 
-
-
-
+            return await edit.edit(f'Error: `{str(e)}`')   
+            await asyncio.sleep(2)      
+        except FloodWait as e:
+            return await edit.edit(f"Bot is limited by telegram for {e.value + 2} seconds.\nPlease wait until then or upgrade to premium plan by contacting @pyro_owner to remove these limitations. ")
 
 
 
