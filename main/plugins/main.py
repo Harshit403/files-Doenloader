@@ -194,7 +194,31 @@ async def clone(bot, event):
            return
     except TypeError:
         return
-
+  #-----------------------------------
+  #-----------------------------------
+     fuck = "" 
+     MONGODB_URI = config("MONGODB_URI", default=None) 
+     db = Database(MONGODB_URI, 'saverestricted') 
+     i, h, t = await db.get_token(event.chat.id) 
+     if i and h and t is not None: 
+         print(t)
+         try: 
+             fuck = Client( 
+                 "save-restricted-ot", 
+                  bot_token=t, 
+                  api_id=int(i), 
+                  api_hash=h
+              ) 
+             await fuck.start() 
+         except ValueError: 
+             return await edit.edit("Your bot cridentials are not valid, please /connect and /login again.") 
+         except Exception as e: 
+             print(e) 
+             return await edit.edit(f'{str(e)}') 
+     else: 
+         return await edit.edit("⚠️You are not connected.\nHit /connect to connect in to the bot.") 
+  #----------------------------------_
+  #----------------------------------_
 
     if 't.me' in link and not 't.me/c/' in  link and not 't.me/+' in link:
         try:
