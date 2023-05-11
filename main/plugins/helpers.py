@@ -23,7 +23,7 @@ async def login(sender, i, h, s):
     
 async def connect(sender, i, h, t):
     MONGODB_URI = config("MONGODB_URI", default=None)
-    db = Database(MONGODB_URI, 'saverestrict')
+    db = Database(MONGODB_URI, 'saverestricted')
     await db.update_api_id(sender, i)
     await db.update_api_hash(sender, h)
     await db.update_token(sender, t)
