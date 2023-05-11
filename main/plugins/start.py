@@ -721,7 +721,7 @@ async def _(event):
     else:
         return
     try:
-        Heroku = heroku3.from_key(API_KEY)
+        Heroku = heroku3.from_key(API_KEY)		
         herokuapp = Heroku.app(APP_NAME)
     except:
         return await event.reply(
@@ -780,23 +780,23 @@ async def set_to(event):
  #   pass
 #-------------------------------------------
 @bot.on(events.NewMessage(pattern="/connect", func=lambda e: e.is_private)) 
- async def lin(event): 
-     Drone = event.client                     
+async def lin(event): 
+    Drone = event.client                     
  #checking is logged in or not btw fuck 
-     xy = await db.is_connected(int(event.sender_id)) 
-     if xy is True: 
-         return await event.reply("Your Bot is already connected.") 
-     async with Drone.conversation(event.chat_id) as conv:  
-         h = API_HASH 
-         i = API_ID     
-         xx = await conv.send_message("Now, send me your Bot Token to connect to the bot\n\nYou can use below button to generate it.", buttons=[Button.url("⚙️ Generate Bot Token", url="https://t.me/botfather")]) 
-         token = await conv.get_response() 
-         t = token.text         
-         if await is_cancel(event, session.text): 
-             return            
-         if not len(s) <= 300: 
-             return await conv.send_message("⚠️ Sorry, but it is not BotToken.\nPress /connect to try again.") 
-         await connect(event.sender_id, i, h, t)  
-         await db.cin(int(event.sender_id)) 
-         await xx.edit(f"✅ Your bot has been connected.\n\n🔗 Now send me your message link to forward Content.") 
+    xy = await db.is_connected(int(event.sender_id)) 
+    if xy is True: 
+        return await event.reply("Your Bot is already connected.") 
+    async with Drone.conversation(event.chat_id) as conv:  
+        h = API_HASH 
+        i = API_ID     
+        xx = await conv.send_message("Now, send me your Bot Token to connect to the bot\n\nYou can use below button to generate it.", buttons=[Button.url("⚙️ Generate Bot Token", url="https://t.me/botfather")]) 
+        token = await conv.get_response() 
+        t = token.text         
+        if await is_cancel(event, session.text): 
+            return            
+        if not len(s) <= 300: 
+            return await conv.send_message("⚠️ Sorry, but it is not BotToken.\nPress /connect to try again.") 
+        await connect(event.sender_id, i, h, t)  
+        await db.cin(int(event.sender_id)) 
+        await xx.edit(f"✅ Your bot has been connected.\n\n🔗 Now send me your message link to forward Content.") 
 
