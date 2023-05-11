@@ -41,7 +41,6 @@ Bot = Client(
     api_hash=API_HASH
 )
 
-errorC = """How fool is it?\nYou sent me invalid session string.\nHit /logout and /login again with valid pyrogram session string.Hit **Session Button** to generate session string."""
 
 async def get_msg(userbot, client, sender, msg_link, edit):
     msg_id = 0
@@ -175,7 +174,7 @@ async def clone(bot, event):
         return
 
     edit = await Bot.send_message(event.chat.id, "⏳")
-#########bot copy############
+    
     hsb = ""
     MONGODB_URI = config("MONGODB_URI", default=None)
     db = Database(MONGODB_URI, 'saverestricted')
@@ -196,8 +195,8 @@ async def clone(bot, event):
             print(e)
             return await edit.edit(f'{str(e)}')
     else:
-        return await edit.edit("⚠️plesse connect your bot.\nHit /bin to connect your bot.")
-#############################
+        return await edit.edit("⚠️plesse connect your bot.\nHit /connect to connect your bot.")
+        
     userbot = ""
     MONGODB_URI = config("MONGODB_URI", default=None)
     db = Database(MONGODB_URI, 'saverestricted')
