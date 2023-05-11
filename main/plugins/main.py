@@ -194,7 +194,9 @@ async def clone(bot, event):
            return
     except TypeError:
         return
-  #-----------------------------------
+  
+
+#-----------------------------------
   #-----------------------------------
      fuck = "" 
      MONGODB_URI = config("MONGODB_URI", default=None) 
@@ -220,19 +222,6 @@ async def clone(bot, event):
   #----------------------------------_
   #----------------------------------_
 
-    if 't.me' in link and not 't.me/c/' in  link and not 't.me/+' in link:
-        try:
-            await get_msg(fuck, fuck, event.chat.id, link, edit)
-        except FloodWait as e:
-            await asyncio.sleep(e.value)
-        except ValueError as v:
-            return await edit.edit(f'`{str(v)}` Only message link allowed.\nMay be your message contains `?single` remove this word from your link and try again')
-            await asyncio.sleep(2)
-        except Exception as e:
-            return await edit.edit(f'Error: `{str(e)}`')   
-            await asyncio.sleep(2)      
-        except FloodWait as e:
-            return await edit.edit(f"Bot is limited by telegram for {e.value + 2} seconds.\nPlease wait until then or upgrade to premium plan by contacting @pyro_owner to remove these limitations. ")
 
     userbot = ""
     MONGODB_URI = config("MONGODB_URI", default=None)
@@ -271,5 +260,17 @@ async def clone(bot, event):
         except BadRequest.CHANNEL_PRIVATE:
             return await edit.edit('Join the channel first.')
             await asyncio.sleep(2)
-
+    if 't.me' in link and not 't.me/c/' in  link and not 't.me/+' in link:
+        try:
+            await get_msg(fuck, fuck, event.chat.id, link, edit)
+        except FloodWait as e:
+            await asyncio.sleep(e.value)
+        except ValueError as v:
+            return await edit.edit(f'`{str(v)}` Only message link allowed.\nMay be your message contains `?single` remove this word from your link and try again')
+            await asyncio.sleep(2)
+        except Exception as e:
+            return await edit.edit(f'Error: `{str(e)}`')   
+            await asyncio.sleep(2)      
+        except FloodWait as e:
+            return await edit.edit(f"Bot is limited by telegram for {e.value + 2} seconds.\nPlease wait until then or upgrade to premium plan by contacting @pyro_owner to remove these limitations. ")
 
