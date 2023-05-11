@@ -1,5 +1,5 @@
 
-import os, time, asyncio, requests, shutil, random, logging
+ import os, time, asyncio, requests, shutil, random, logging
  #shit 
  from hachoir.metadata import extractMetadata 
  from hachoir.parser import createParser 
