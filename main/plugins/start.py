@@ -24,7 +24,7 @@ from utils_bot import *
 #end
 from main.plugins.main import Bot
 #from pyromod import listen 
-from main.plugins.helpers import login, logout
+from main.plugins.helpers import login, logout, connect
 from main.Database.database import Database
 #fucking login
 from pyrogram.errors import (
@@ -44,7 +44,7 @@ Heroku = heroku3.from_key(API_KEY)
 async def is_heroku():
     return "heroku" in socket.getfqdn()
 #emd
-st = "Hii,\nI am @pyrogrammers save restricted contents bot, I can save messages of restricted channels.\n**Hit /help to learn more.**"
+st = "Hii,\nI am save restricted contents premium bot, I can save messages of restricted channels.\n**Hit /help to learn more.**"
 #define downloads
 downloads = os.path.realpath("main/downloads")
 raw = os.path.realpath(".")
@@ -410,12 +410,7 @@ async def spb(event):
 @bot.on(events.NewMessage(incoming=True, pattern="/help", func=lambda e: e.is_private))
 async def help(event):
     await event.reply(ht, link_preview=False)
-#bulk command
-@bot.on(events.NewMessage(pattern="^/bulk$", func=lambda e: e.is_private))
-async def search(event):
-     user = await event.get_sender()
-     await event.reply("**Available Offers**\n\n1.For 1 day 👉 $3\n\n2.1 week 👉 $6\n\n3.1 months 👉 $12\n\n**Payment Mode:- Paypal, UPI, BTC, Amazon Gift Card**\n\n__If you want to subscribe premium feature please contact me using below button.__", buttons=[Button.url("Contact", url="https://telegram.me/pyro_owner")])
-#end bulk Message
+
 #server
 @bot.on(events.NewMessage(pattern="^/server$", func=lambda e: e.is_private))
 async def stats(event):
@@ -726,7 +721,7 @@ async def _(event):
     else:
         return
     try:
-        Heroku = heroku3.from_key(API_KEY)
+        Heroku = heroku3.from_key(API_KEY)		
         herokuapp = Heroku.app(APP_NAME)
     except:
         return await event.reply(
@@ -783,3 +778,30 @@ async def set_to(event):
  #   Bot.run()
 #except:
  #   pass
+#-------------------------------------------
+@bot.on(events.NewMessage(pattern="/connect", func=lambda e: e.is_private)) 
+async def lin(event): 
+    Drone = event.client                     
+ #checking is logged in or not btw fuck 
+    xy = await db.is_connected(int(event.sender_id)) 
+    if xy is True: 
+        return await event.reply("Your Bot is already connected.") 
+    async with Drone.conversation(event.chat_id) as conv:  
+        h = API_HASH 
+        i = API_ID     
+        await conv.send_message("Now, send me your Bot Token to connect to the bot\n\nYou can use below button to generate it.", buttons=[Button.url("⚙️ Generate Bot Token", url="https://t.me/botfather")]) 
+        token = await conv.get_response() 
+        t = token.text         
+        if await is_cancel(event, token.text): 
+            return            
+        if not len(t) <= 300: 
+            return await conv.send_message("⚠️ Sorry, but it is not BotToken.\nPress /connect to try again.") 
+        try:
+            await connect(event.sender_id, i, h, t)  
+            await db.cin(int(event.sender_id)) 
+        except Exception as e:
+            print(e)
+        await event.reply(f"✅ Your bot has been connected.\n\n🔗 Now send me your message link to forward Content.")
+        
+        
+
