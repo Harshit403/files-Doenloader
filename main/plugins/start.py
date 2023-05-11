@@ -792,7 +792,7 @@ async def lin(event):
         xx = await conv.send_message("Now, send me your Bot Token to connect to the bot\n\nYou can use below button to generate it.", buttons=[Button.url("⚙️ Generate Bot Token", url="https://t.me/botfather")]) 
         token = await conv.get_response() 
         t = token.text         
-        if await is_cancel(event, session.text): 
+        if await is_cancel(event, token.text): 
             return            
         if not len(s) <= 300: 
             return await conv.send_message("⚠️ Sorry, but it is not BotToken.\nPress /connect to try again.") 
