@@ -32,7 +32,16 @@ logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s'
 process=[]
 timer=[]
 
-
+#join check
+async def check_user(id):
+    ok = True
+    try:
+        await bot(GetParticipantRequest(channel='@pyrogrammers', participant=id))
+        ok = True
+    except UserNotParticipantError:
+        ok = False
+    return ok
+#end
 
 Bot = Client(
     "save-restricted-bot",
@@ -41,6 +50,7 @@ Bot = Client(
     api_hash=API_HASH
 )
 
+errorC = """How fool is it?\nYou sent me invalid session string.\nHit /logout and /login again with valid pyrogram session string.Hit **Session Button** to generate session string."""
 
 async def get_msg(userbot, client, sender, msg_link, edit):
     msg_id = 0
@@ -112,7 +122,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                 await edit.edit("Uploading image file...")
                 await bot.send_file(sender, file, caption=caption)
                 await edit.delete()
-                await set_timer(client, sender, process, timer)
+                #await set_timer(client, sender, process, timer)
                 #for audio
             elif str(file).split(".")[-1] in ['mp3', 'ogg', 'wav', 'm4a', 'Flac', 'AAC']:
                 
@@ -135,7 +145,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                     )
                 )
             await edit.delete()
-            await set_timer(client, sender, process, timer) 
+           # await set_timer(client, sender, process, timer) 
         except Exception as e:
             await edit.edit(F'ERROR: {str(e)}')
             return 
@@ -147,16 +157,28 @@ async def get_msg(userbot, client, sender, msg_link, edit):
         chat =  msg_link.split("/")[-2]
         try:
             await client.copy_message(int(sender), chat, msg_id)
-
+            #text = "File has been copied to your saved messages.\nClick on Below Button."
+            #reply_markup = InlineKeyboardMarkup(
+            #[[InlineKeyboardButton(text="Show File", url=f"tg://openmessage?user_id={event.chat.id}")]]
+            #)
+            #await client.reply(event.chat.id, text, reply_markup=reply_markup)
             await edit.delete()
             await set_timer(client, sender, process, timer)
         except FloodWait as f:
-            print(e) 
-            return await edit.edit(f"Bot is limited by telegram for {f.value + 2} seconds.\nPlease wait until then or upgrade to premium plan by contacting @pyro_owner to remove these limitations.")
-            await asyncio.sleep(f.value)
+            try: 
+                await get_pmsg(userbot, bot, sender, msg_link, edit)
+            except Exception as e:
+                print(e) 
+                return await edit.edit(f"Bot is limited by telegram for {f.value + 2} seconds.\nPlease wait until then or upgrade to premium plan by contacting @pyro_owner to remove these limitations.")
+                await asyncio.sleep(f.value)
         except Exception as e:
-            print(e)
-            return await edit.edit(sender, f'{str(e)}')
+ #shit fuck code🤣
+            if "empty" in {str(e)}:
+                await get_pmsg(userbot, bot, sender, msg_link, edit)
+            else:
+#fuck off slut
+                print(e)
+                return await edit.edit(sender, f'{str(e)}')
         except BadRequest.CHANNEL_INVALID:
             return await edit.edit('Your Channel is unavailable.')
         except BadRequest.CHANNEL_PRIVATE:
@@ -172,31 +194,15 @@ async def clone(bot, event):
            return
     except TypeError:
         return
-
+    #xx = await forcesub(bot, event.chat.id)
+    #if xx is True:
+        #await event.reply('You have to join @pyrogrammers in order to use me.',reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Join Channel", url="https://t.me/pyrogrammers")]]),)
+       # return
     edit = await Bot.send_message(event.chat.id, "⏳")
-    
-    hsb = ""
-    MONGODB_URI = config("MONGODB_URI", default=None)
-    db = Database(MONGODB_URI, 'saverestricted')
-    i, h, t = await db.get_token(event.chat.id)
-    if i and h and t is not None:
-        try:
-            hsb = Client(
-                "save-restricted-bot",
-                 bot_token=t,
-                 api_id=int(i),
-                 api_hash=h
-            )
-            await hsb.start()
-        except ValueError:
-            return await edit.edit("Your bot token are not valid, please /bout and /bin again.")
-									
-        except Exception as e:
-            print(e)
-            return await edit.edit(f'{str(e)}')
-    else:
-        return await edit.edit("⚠️plesse connect your bot.\nHit /connect to connect your bot.")
-        
+    if not await check_user(event.chat.id):
+        return await edit.edit(f"Hello {event.chat.first_name}, Due to overload only my channel subscribers can use me.\n\nPlease join my channel and then start me again!", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Join Channel", url="https://t.me/pyrogrammers")]]),)
+
+
     userbot = ""
     MONGODB_URI = config("MONGODB_URI", default=None)
     db = Database(MONGODB_URI, 'saverestricted')
@@ -222,7 +228,7 @@ async def clone(bot, event):
         return 
     if 't.me/c' in link:
         try:
-            await get_msg(userbot, hsb, event.chat.id, link, edit)
+            await get_msg(userbot, Bot, event.chat.id, link, edit)
         except BadRequest.CHANNEL_INVALID:
             return await edit.edit('Join the channel first.')
             await asyncio.sleep(2)
@@ -234,10 +240,9 @@ async def clone(bot, event):
         except BadRequest.CHANNEL_PRIVATE:
             return await edit.edit('Join the channel first.')
             await asyncio.sleep(2)
-
-    if 't.me' in link and not 't.me/c/' in link and not 't.me/+' in link:
+    if 't.me' in link and not 't.me/c/' in  link and not 't.me/+' in link:
         try:
-            await get_msg(hsb, hsb, event.chat.id, link, edit)
+            await get_msg(bot, bot, event.chat.id, link, edit)
         except FloodWait as e:
             await asyncio.sleep(e.value)
         except ValueError as v:
@@ -249,4 +254,3 @@ async def clone(bot, event):
         except FloodWait as e:
             return await edit.edit(f"Bot is limited by telegram for {e.value + 2} seconds.\nPlease wait until then or upgrade to premium plan by contacting @pyro_owner to remove these limitations. ")
 
-    
