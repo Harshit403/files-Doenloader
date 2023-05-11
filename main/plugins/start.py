@@ -789,14 +789,19 @@ async def lin(event):
     async with Drone.conversation(event.chat_id) as conv:  
         h = API_HASH 
         i = API_ID     
-        xx = await conv.send_message("Now, send me your Bot Token to connect to the bot\n\nYou can use below button to generate it.", buttons=[Button.url("⚙️ Generate Bot Token", url="https://t.me/botfather")]) 
+        await conv.send_message("Now, send me your Bot Token to connect to the bot\n\nYou can use below button to generate it.", buttons=[Button.url("⚙️ Generate Bot Token", url="https://t.me/botfather")]) 
         token = await conv.get_response() 
         t = token.text         
         if await is_cancel(event, token.text): 
             return            
         if not len(t) <= 300: 
             return await conv.send_message("⚠️ Sorry, but it is not BotToken.\nPress /connect to try again.") 
-        await connect(event.sender_id, i, h, t)  
-        await db.cin(int(event.sender_id)) 
-        await xx.edit(f"✅ Your bot has been connected.\n\n🔗 Now send me your message link to forward Content.") 
+        try:
+            await connect(event.sender_id, i, h, t)  
+            await db.cin(int(event.sender_id)) 
+        except Exception as e:
+            print(e)
+        await event.reply(f"✅ Your bot has been connected.\n\n🔗 Now send me your message link to forward Content.")
+        
+        
 
