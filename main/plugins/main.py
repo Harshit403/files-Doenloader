@@ -242,8 +242,8 @@ async def clone(bot, event):
              except Exception as e:  
                  print(e)  
                  return await edit.edit(f'{str(e)}')  
-.        else:  
-             return await edit.edit("⚠️You are not connected.\nHit /connect to connect in to the bot.")  
+.         else:  
+              return await edit.edit("⚠️You are not connected.\nHit /connect to connect in to the bot.")  
    #---------------------------------- 
   
   #----------------------------------
