@@ -203,7 +203,7 @@ async def clone(bot, event):
     db = Database(MONGODB_URI, 'saverestricted')
     i, h, s = await db.get_credentials(event.chat.id)
     try:
-        t = await db.get_credentials(event.chat.id)
+        t = await db.get_token(event.chat.id)
     except:
         await edit.edit("Please /connect your bot.")
     if i and h and s is not None:
