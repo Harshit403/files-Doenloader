@@ -194,7 +194,7 @@ async def clone(bot, event):
            return
     except TypeError:
         return
-  
+    edit = await Bot.send_message(event.chat.id, "⏳")
 
 
     fuck = ""
