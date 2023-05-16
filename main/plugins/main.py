@@ -226,6 +226,7 @@ async def clone(bot, event):
                  api_id=int(i),
                  api_hash=h
             )
+            await fuck.start()
         except ValueError:
             return await edit.edit("Please /connect your bot.")
         except Exception as e:
