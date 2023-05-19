@@ -26,3 +26,5 @@ API_KEY = config("API_KEY", None)
 HU_APP = from_key(API_KEY).apps()[APP_NAME]
 #end heroku 
 bot = TelegramClient('bot', API_ID, API_HASH).start(bot_token=BOT_TOKEN) 
+
+ForceBot = TelegramClient('Bot', int(APP_ID), API_HASH).start(bot_token=BOT_TOKEN) 
