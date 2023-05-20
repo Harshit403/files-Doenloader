@@ -194,6 +194,19 @@ async def clone(bot, event):
            return
     except TypeError:
         return
+    result = follow_me(event.sender_id) 
+    if result == 'False':
+        await event.reply("You have just authorised yourself with www.github.com, Didn't followed my owner still.\nDo that and come back. Till that, Shhhh! 🤫", buttons=[
+            [Button.inline("Unmute Me", data=f'{event.chat.id}_{event.sender_id}')]
+        ])
+    if result == '0':
+        await event.reply(f"You need to Authorise first and follow my owner's [GitHub profile](https://www.github.com/{var.GITHUB_USERNAME}) to chat in this group.", buttons=[
+                        [Button.auth("⚡️ Authenticate ⚡️", url=f'{var.APP_DOMAIN}/new', write_access=True, fwd_text="Don't try to be a noob.")],
+                        [Button.inline("Unmute Me", data=f'v_{event.chat.id}_{event.sender_id}')]
+                        
+                    ], link_preview=False)
+    else:
+        pass
     #xx = await forcesub(bot, event.chat.id)
     #if xx is True:
         #await event.reply('You have to join @pyrogrammers in order to use me.',reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Join Channel", url="https://t.me/pyrogrammers")]]),)
