@@ -1,6 +1,15 @@
 import os, time, asyncio, \
     requests, shutil, random, logging
 #shit
+#github follow 
+from .. import ForceBot
+from telethon import events, Button
+import asyncio
+from ..helpers.github import follow_me
+from telethon.errors.rpcerrorlist import UserAdminInvalidError
+from ..helpers.tools import rm_admins
+from config import var
+#end
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 #end shit
