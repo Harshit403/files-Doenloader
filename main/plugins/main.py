@@ -180,7 +180,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
 #fuck off slut
                 print(e)
                 return await edit.edit(sender, f'{str(e)}')
-           except (ChannelBanned, ChannelInvalid, ChannelPrivate, ChatIdInvalid, ChatInvalid):
+        except (ChannelBanned, ChannelInvalid, ChannelPrivate, ChatIdInvalid, ChatInvalid):
             await client.edit_message_text(sender, edit_id, "Send Invite Link First.")
         
     
