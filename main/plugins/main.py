@@ -197,13 +197,13 @@ async def clone(bot, event):
     #if xx is True:
         #await event.reply('You have to join @pyrogrammers in order to use me.',reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Join Channel", url="https://t.me/pyrogrammers")]]),)
        # return
-    edit = await Bot.send_message(event.chat.id, "⏳")
+    edit = await event.reply("⏳")
     if not await check_user(event.chat.id):
         return await edit.edit(f"Hello {event.chat.first_name}, Due to overload only my channel subscribers can use me.\n\nPlease join my channel and then start me again!", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Join Channel", url="https://t.me/pyrogrammers")]]),)
 
     if 't.me' in link and not 't.me/c/' in link and not 't.me/+' in link:
         try:
-            await get_msg(bot, bot, event.chat.id, link, edit)
+            await get_msg(bot, Bot, event.chat.id, link, edit)
         except FloodWait as e:
             await asyncio.sleep(e.value)
         except ValueError as v:
