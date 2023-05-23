@@ -10,6 +10,7 @@ from .. import bot as Drone, bot
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from .. import bot, API_ID, API_HASH, BOT_TOKEN, FORCESUB, ACCESS
 import os
+from pyrogram.errors import ChannelBanned, ChannelInvalid, ChannelPrivate, ChatIdInvalid, ChatInvalid
 from main.plugins.helpers import get_link, forcesub, forcesub_text, join, set_timer, check_timer, screenshot
 from main.plugins.display_progress import progress_for_pyrogram
 from main.Database.database import Database
@@ -179,10 +180,8 @@ async def get_msg(userbot, client, sender, msg_link, edit):
 #fuck off slut
                 print(e)
                 return await edit.edit(sender, f'{str(e)}')
-        except BadRequest.CHANNEL_INVALID:
-            return await edit.edit('Your Channel is unavailable.')
-        except BadRequest.CHANNEL_PRIVATE:
-            return await edit.edit('You have not joined the channel yet!.')
+           except (ChannelBanned, ChannelInvalid, ChannelPrivate, ChatIdInvalid, ChatInvalid):
+            await client.edit_message_text(sender, edit_id, "Send Invite Link First.")
         
     
         
@@ -250,8 +249,8 @@ async def clone(bot, event):
         except Exception as e:
             return await edit.edit(f'Error: `{str(e)}`')
             await asyncio.sleep(2)         
-        except BadRequest.CHANNEL_PRIVATE:
-            return await edit.edit('Join the channel first.')
+        except (ChannelBanned, ChannelInvalid, ChannelPrivate, ChatIdInvalid, ChatInvalid):
+            await edit.edit(sender, edit_id, "Send Invite Link First.")
             await asyncio.sleep(2)
 
 ##########################Public group#############################
