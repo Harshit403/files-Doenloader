@@ -1,19 +1,11 @@
-
-
 from main.Database.database import Database
-
 from pyrogram import Client, filters, idle
 from pyrogram.errors import FloodWait, BadRequest
 from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant
-
 import asyncio, subprocess, re, os, time
 from decouple import config
 
-forcesub_text = 'You have to join @pyrogrammers to use this bot.'
-
-
 #Multi client-------------------------------------------------------------------------------------------------------------
-
 async def login(sender, i, h, s):
     MONGODB_URI = config("MONGODB_URI", default=None)
     db = Database(MONGODB_URI, 'saverestricted')
@@ -29,7 +21,6 @@ async def logout(sender):
     await db.rem_session(sender)
    
 #Join private chat-------------------------------------------------------------------------------------------------------------
-
 async def join(client, invite_link):
     try:
         await client.join_chat(invite_link)
@@ -41,21 +32,7 @@ async def join(client, invite_link):
     except Exception as e:
         return f"❌Something went wrong."
         await asyncio.sleep(3)   
-#forcesub-------------------------------------------------------------------------------------------------------------
-
-async def forcesub(bot, sender):
-    FORCESUB = config("FORCESUB", default=None)
-    if not str(FORCESUB).startswith("-100"):
-        FORCESUB = int("-100" + str(FORCESUB))
-    try:
-        user = await bot.get_chat_member(FORCESUB, sender)
-        if user.status == "kicked":
-            return True
-    except UserNotParticipant:
-        return True
-    except Exception as e:
-        print(e)
-        return True
+        
         
 #Regex---------------------------------------------------------------------------------------------------------------
 #to get the url from event
