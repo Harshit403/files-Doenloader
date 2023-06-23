@@ -1,14 +1,9 @@
 import os, time, asyncio, \
     requests, shutil, random, logging
-#shit
-from hachoir.metadata import extractMetadata
-from hachoir.parser import createParser
-#end shit
 from pyrogram.enums import MessageMediaType
 from .. import bot as Drone, bot
-#from pyromod import listen
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-from .. import bot, API_ID, API_HASH, BOT_TOKEN, FORCESUB, ACCESS
+from .. import bot, API_ID, API_HASH, BOT_TOKEN, FORCESUB, ACCESS, FORCESUB
 import os
 from pyrogram.errors import ChannelBanned, ChannelInvalid, ChannelPrivate, ChatIdInvalid, ChatInvalid
 from main.plugins.helpers import get_link, forcesub, forcesub_text, join, set_timer, check_timer, screenshot
@@ -20,12 +15,10 @@ from telethon import events, Button
 from telethon.tl.functions.users import GetFullUserRequest
 from telethon.errors.rpcerrorlist import UserNotParticipantError
 from telethon.tl.functions.channels import GetParticipantRequest
-#end
 from pyrogram.errors import FloodWait, BadRequest
 from pyrogram import Client, filters, idle
-#from ethon.pyfunc import video_metadata
-
 import re, time, asyncio, logging
+from PyHarshit.tg.extractor import videoMetaData
 
 logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s',
                     level=logging.WARNING)
@@ -33,11 +26,10 @@ logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s'
 process=[]
 timer=[]
 
-#join check
 async def check_user(id):
     ok = True
     try:
-        await bot(GetParticipantRequest(channel='@pyrogrammers', participant=id))
+        await bot(GetParticipantRequest(channel=FORCESUB, participant=id))
         ok = True
     except UserNotParticipantError:
         ok = False
@@ -68,23 +60,25 @@ async def get_msg(userbot, client, sender, msg_link, edit):
         st, r = check_timer(sender, process, timer) 
         if st == False:
             return await edit.edit(r) 
-        chat = int('-100' + str(msg_link.split("/")[-2]))
+        if 't.me/b/' in msg_link:
+            chat = str(msg_link.split("/")[-2])
+        else:
+            chat = int('-100' + str(msg_link.split("/")[-2]))
+        file = ""
         try:
             msg = await userbot.get_messages(chat, msg_id)
-
             edit = await edit.edit('Processing...')
-#end
             file = await userbot.download_media(
                 msg,
                 progress=progress_for_pyrogram,
                 progress_args=(
                     userbot,
-                    "**Downloading:**\n",
+                    "🟢 Downloading:\n",
                     edit,
                     time.time()
                 )
             )
-            await edit.edit('UploadinG...')
+            await edit.edit('⚪ Uploading...')
             caption = str(file)
             if msg.caption is not None:
                 caption = msg.caption
@@ -93,16 +87,9 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                     path = str(file).split(".")[0] + ".mp4"
                     os.rename(file, path) 
                     file = str(file).split(".")[0] + ".mp4"
-                #data = video_metadata(file)
-                #duration = data["duration"]
-#mffff
-                metadata = extractMetadata(createParser(file))
-                duration = 0
-                if metadata.has("duration"):
-                    duration = metadata.get('duration').seconds
-                width = 0
-                height = 0
-#mffff
+                data = videoMetaData(file)
+                height, width, duration = data["height"], data["width"], data["duration"]
+                print(f'd: {duration}, w: {width}, h:{height}')
                 thumb_path = await screenshot(file, duration/2, sender)
                 await client.send_video(
                     chat_id=sender,
@@ -123,11 +110,8 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                 await edit.edit("Uploading image file...")
                 await bot.send_file(sender, file, caption=caption)
                 await edit.delete()
-                #await set_timer(client, sender, process, timer)
-                #for audio
+                await set_timer(client, sender, process, timer)
             elif str(file).split(".")[-1] in ['mp3', 'ogg', 'wav', 'm4a', 'Flac', 'AAC']:
-                
-                
                 await edit.edit("Uploading Audio File...")
                 await client.send_audio(sender, file, caption=caption)
                 await edit.delete() 
@@ -146,7 +130,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                     )
                 )
             await edit.delete()
-           # await set_timer(client, sender, process, timer) 
+            await set_timer(client, sender, process, timer) 
         except Exception as e:
             await edit.edit(F'ERROR: {str(e)}')
             return 
@@ -158,11 +142,6 @@ async def get_msg(userbot, client, sender, msg_link, edit):
         chat =  msg_link.split("/")[-2]
         try:
             await client.copy_message(int(sender), chat, msg_id)
-            #text = "File has been copied to your saved messages.\nClick on Below Button."
-            #reply_markup = InlineKeyboardMarkup(
-            #[[InlineKeyboardButton(text="Show File", url=f"tg://openmessage?user_id={event.chat.id}")]]
-            #)
-            #await client.reply(event.chat.id, text, reply_markup=reply_markup)
             await edit.delete()
             await set_timer(client, sender, process, timer)
         except FloodWait as f:
@@ -173,17 +152,16 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                 return await edit.edit(f"Bot is limited by telegram for {f.value + 2} seconds.\nPlease wait until then or upgrade to premium plan by contacting @pyro_owner to remove these limitations.")
                 await asyncio.sleep(f.value)
         except Exception as e:
- #shit fuck code🤣
-            if "empty" in {str(e)}:
-                await get_pmsg(userbot, bot, sender, msg_link, edit)
+            if "Empty messages cannot be copied" in str(e):
+                group = await userbot.get_users(chat)
+                group_link = f't.me/c/{int(group.id)}/{int(msg_id)}'
+                return await get_msg(userbot, client, bot, sender, edit_id, msg_link, i)
             else:
-#fuck off slut
+                print(e)
                 print(e)
                 return await edit.edit(sender, f'{str(e)}')
         except (ChannelBanned, ChannelInvalid, ChannelPrivate, ChatIdInvalid, ChatInvalid):
             await client.edit_message_text(sender, edit_id, "Send Invite Link First.")
-        
-    
         
 @Bot.on_message(filters.private & filters.incoming)
 async def clone(bot, event):
@@ -193,10 +171,6 @@ async def clone(bot, event):
            return
     except TypeError:
         return
-    #xx = await forcesub(bot, event.chat.id)
-    #if xx is True:
-        #await event.reply('You have to join @pyrogrammers in order to use me.',reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Join Channel", url="https://t.me/pyrogrammers")]]),)
-       # return
     try:
         edit = await event.reply('⏳')
     except Exception as e:
@@ -255,102 +229,3 @@ async def clone(bot, event):
         except (ChannelBanned, ChannelInvalid, ChannelPrivate, ChatIdInvalid, ChatInvalid):
             await edit.edit(sender, edit_id, "Send Invite Link First.")
             await asyncio.sleep(2)
-
-##########################Public group#############################
-async def get_pmsg(userbot, client, sender, msg_link, edit):
-    chat = ""
-    msg_id = int(msg_link.split("/")[-1])
-    if 't.me/' in msg_link and not 't.me/c' in msg_link:
-        #st, r = check_timer(sender, process, timer) 
-        #if st == False:
-            #return await edit.edit(r) 
-        chat =  msg_link.split("/")[-2]
-        try:
-            msg = await userbot.get_messages(chat, msg_id)
-
-            edit = await edit.edit('Processing...')
-#end
-            file = await userbot.download_media(
-                msg,
-                progress=progress_for_pyrogram,
-                progress_args=(
-                    userbot,
-                    "**Downloading:**\n",
-                    edit,
-                    time.time()
-                )
-            )
-            await edit.edit('UploadinG...')
-            caption = str(file)
-            if msg.caption is not None:
-                caption = msg.caption
-            if str(file).split(".")[-1] in ['mkv', 'mp4', 'webm']:
-                if str(file).split(".")[-1] in ['webm', 'mkv']:
-                    path = str(file).split(".")[0] + ".mp4"
-                    os.rename(file, path) 
-                    file = str(file).split(".")[0] + ".mp4"
-                #data = video_metadata(file)
-                #duration = data["duration"]
-#mffff
-                metadata = extractMetadata(createParser(file))
-                duration = 0
-                if metadata.has("duration"):
-                    duration = metadata.get('duration').seconds
-                width = 0
-                height = 0
-#mffff
-                thumb_path = await screenshot(file, duration/2, sender)
-                await Bot.send_video(
-                    chat_id=sender,
-                    video=file,
-                    caption=caption,
-                    supports_streaming=True,
-                    duration=duration,
-                    thumb=thumb_path,
-                    progress=progress_for_pyrogram,
-                    progress_args=(
-                        client,
-                        '**Uploading:**\n',
-                        edit,
-                        time.time()
-                    )
-                )
-            elif str(file).split(".")[-1] in ['jpg', 'jpeg', 'png', 'webp']:
-                await edit.edit("Uploading image file...")
-                await Bot.send_photo(sender, file, caption=caption)
-                await edit.delete()
-                await set_timer(client, sender, process, timer)
-                #for audio
-            elif str(file).split(".")[-1] in ['mp3', 'ogg', 'wav', 'm4a', 'Flac', 'AAC']:
-                
-                
-                await edit.edit("Uploading Audio File...")
-                await Bot.send_audio(sender, file, caption=caption)
-                await edit.delete() 
-                await set_timer(client, sender, process, timer)
-            else:
-                await Bot.send_document(
-                    sender,
-                    file, 
-                    caption=caption,
-                    progress=progress_for_pyrogram,
-                    progress_args=(
-                        client,
-                        '<b><u>Uploading...</b></u>\n',
-                        edit,
-                        time.time()
-                    )
-                )
-            await edit.delete()
-            await set_timer(client, sender, process, timer) 
-        except Exception as e:
-            await edit.edit(F'ERROR: {str(e)}')
-            return 
-    else:
-         await Bot.send_message(event.chat.id, "🥺 Something unexpected occurred, please let me know.") 
-
-
-
-
-
-
