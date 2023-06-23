@@ -166,7 +166,7 @@ async def clone(bot, event):
     except Exception as e:
         await event.reply(f'Error: {e}')
     if not await check_user(event.chat.id):
-        return await edit.edit(f"Hello {event.chat.first_name}, Due to overload only my channel subscribers can use me.\n\nPlease join my channel and then start me again!", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Join Channel", url="https://t.me/pyrogrammers")]]),)
+        return await edit.edit(f"Hello {event.chat.first_name}, Due to overload only my channel subscribers can use me.\n\nPlease join my channel and then start me again!", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Join Channel", url=f"https://t.me/{FORCESUB}")]]),)
 
     if 't.me' in link and not 't.me/c/' in link and not 't.me/+' in link:
         try:
