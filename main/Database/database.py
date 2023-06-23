@@ -81,4 +81,7 @@ class Database:
       
     async def lout(self, id):
         await self.col.update_one({'id': id}, {'$set': {'log': False}})
-
+      
+    async def used_limit(self, id, used):
+        await self.col.update_one({'id': id}, {'$set': {'used_limit': used}})
+    
