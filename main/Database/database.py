@@ -71,8 +71,6 @@ class Database:
         s = user.get('session', None)
         return i, h, s 
    
-    
-##############checking is logged in or not###############
     async def loin(self, id):
         await self.col.update_one({'id': id}, {'$set': {'log': True}})
     
