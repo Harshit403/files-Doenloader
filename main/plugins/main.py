@@ -4,6 +4,7 @@ import os, time, asyncio, \
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 #end shit
+from main.plugins import db
 from pyrogram.enums import MessageMediaType
 from .. import bot as Drone, bot
 #from pyromod import listen
@@ -176,16 +177,14 @@ async def clone(bot, event):
     edit = await Bot.send_message(event.chat.id, "⏳")
     
     hsb = ""
-    MONGODB_URI = config("MONGODB_URI", default=None)
-    db = Database(MONGODB_URI, 'saverestricted')
-    i, h, t = await db.get_token(event.chat.id)
-    if i and h and t is not None:
+    t = db.get(event.chat.id)
+    if t is not None:
         try:
             hsb = Client(
                 f"{event.chat.id}",
                  bot_token=t,
-                 api_id=int(i),
-                 api_hash=h
+                 api_id=int(API_ID),
+                 api_hash=API_HASH
             )
             await hsb.start()
         except ValueError:
