@@ -7,8 +7,7 @@ import heroku3
 import sys
 from datetime import datetime
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-from .. import bot, ACCESS, API_HASH, API_ID, AUTH_USERS, UPSTREAM_REPO, HU_APP, APP_NAME, API_KEY, STRINGLOG
-#utils
+from .. import bot, FORCESUB, ACCESS, API_HASH, API_ID, AUTH_USERS, HU_APP, APP_NAME, API_KEY, STRINGLOG
 import platform
 import math
 import re
@@ -18,38 +17,31 @@ import socket
 from telethon import events, Button, TelegramClient
 from decouple import config
 from pyrogram import Client
-#start fucking
 import shutil, psutil
 from utils_bot import *
-#end
 from main.plugins.main import Bot
-#from pyromod import listen 
 from main.plugins.helpers import login, logout
 from main.Database.database import Database
-#fucking login
 from pyrogram.errors import (
     SessionPasswordNeeded, FloodWait,
     PhoneNumberInvalid, ApiIdInvalid,
     PhoneCodeInvalid, PhoneCodeExpired
 )
-#end fucking login
 from main.plugins.dbstuff import db
-#start time define
+
 StartTime = time.time()
 __version__ = 1.1
-#end
 heroku_api = "https://api.heroku.com"
 Heroku = heroku3.from_key(API_KEY)
-#is heroku
+
 async def is_heroku():
     return "heroku" in socket.getfqdn()
-#emd
-st = "Hii,\nI am @pyrogrammers save restricted contents bot, I can save messages of restricted channels.\n**Hit /help to learn more.**"
-#define downloads
+    
+
 downloads = os.path.realpath("main/downloads")
 raw = os.path.realpath(".")
-#end
-ht = """**For Public Restricted Channel contents.**\nTo get public restricted Channel contents, just send your Post link i will give you that post without Downloading.\n\n**For Private Restricted Channel contents.**\nIn order to be able to access private restricted Channel contents by bot,Hit **/login** and then follow further instructions Hence, you are logged in to bot.\nAfter then just send your post link to me, i will give you the post."""
+ht = """**For Public Channels.**\nTo get public Channel contents, just send your message link i will give you that post without Downloading.\n\n**For Private Channels.**\nIn order to be able to access private Channel contents by bot,Hit **/login** and then follow further instructions Hence, you are logged in to bot.\nAfter then just send your post link to me, i will give you the message."""
+
 #human bytes
 def humanbytes(size):
     """Convert Bytes To Bytes So That Human Can Read It"""
@@ -62,16 +54,13 @@ def humanbytes(size):
         size /= power
         raised_to_pow += 1
     return str(round(size, 2)) + " " + dict_power_n[raised_to_pow] + "B"
-#end
-  #start message 
-#join checks 
-# join checks
+
 async def check_user(user):
     ok = True
     try:
         await bot(
             functions.channels.GetParticipantRequest(
-                channel="pyrogrammers", participant=user
+                channel=FORCESUB, participant=user
             )
         )
         ok = True
@@ -86,9 +75,7 @@ async def start(event):
     Dick= await event.reply("Intialising...")
     end_t = time.time()
     time_taken_s = (end_t - start_t) * 1000
-    if time_taken_s >= 700:
-        #await event.answer("🔴 Bot Restarted due to high ping value.")
-        #await event.send_message(LOGS, "#restart Restarting... It will take upto 5 seconds.")
+    if time_taken_s >= 700: 
         await Dick.edit(f'👋 Hey **{event.sender.first_name}**,\n\nI am Save Restricted Contents Bot, I can save files of restricted channels as well as group.\n\n__Hit /help to learn more.__', 
                       buttons=[
                         [Button.url("📢 Updates Channel", url="https://t.me/Pyrogrammers"),
@@ -117,7 +104,6 @@ async def start(event):
                     ])
         if not await check_user(event.sender_id):
             return await Dick.edit(f"Hello {event.sender.first_name}, Due to overload only my channel subscribers can use me.\n\nPlease join my channel and then start me again!", buttons=[Button.url("Join Channel", url="https://t.me/pyrogrammers")])
-#end message 
     tag = f'[{event.sender.first_name}](tg://user?id={event.sender_id})'
     await event.client.send_message(int(ACCESS), f'#NEW_USER {tag} started the BOT\nUserID: {event.sender_id}') 
     try:
