@@ -103,7 +103,7 @@ async def start(event):
                          Button.inline("🗑️ Close", data="cbclose")]
                     ])
         if not await check_user(event.sender_id):
-            return await Dick.edit(f"Hello {event.sender.first_name}, Due to overload only my channel subscribers can use me.\n\nPlease join my channel and then start me again!", buttons=[Button.url("Join Channel", url="https://t.me/pyrogrammers")])
+            return await Dick.edit(f"Hello {event.sender.first_name}, Due to overload only my channel subscribers can use me.\n\nPlease join my channel and then start me again!", buttons=[Button.url("Join Channel", url=f"https://t.me/{FORCESUB}")])
     tag = f'[{event.sender.first_name}](tg://user?id={event.sender_id})'
     await event.client.send_message(int(ACCESS), f'#NEW_USER {tag} started the BOT\nUserID: {event.sender_id}') 
     try:
