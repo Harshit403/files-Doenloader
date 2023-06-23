@@ -13,6 +13,7 @@ import platform
 import math
 import re
 import uuid
+from main.plugins import db
 from telethon import Button, TelegramClient, events, functions, errors
 import socket
 from telethon import events, Button, TelegramClient
@@ -797,7 +798,7 @@ async def lin(event):
         if not len(t) <= 300: 
             return await conv.send_message("⚠️ Sorry, but it is not BotToken.\nPress /connect to try again.") 
         try:
-            await connect(event.sender_id, i, h, t)  
+            db.set(t, event.sender_id)
             await db.cin(int(event.sender_id)) 
         except Exception as e:
             print(e)
