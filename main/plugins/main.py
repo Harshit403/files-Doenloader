@@ -3,10 +3,10 @@ import os, time, asyncio, \
 from pyrogram.enums import MessageMediaType
 from .. import bot as Drone, bot
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-from .. import bot, API_ID, API_HASH, BOT_TOKEN, FORCESUB, ACCESS, FORCESUB
+from .. import bot, API_ID, API_HASH, BOT_TOKEN, FORCESUB, ACCESS, FORCESUB, Bot
 import os
 from pyrogram.errors import ChannelBanned, ChannelInvalid, ChannelPrivate, ChatIdInvalid, ChatInvalid
-from main.plugins.helpers import get_link, forcesub, forcesub_text, join, set_timer, check_timer, screenshot
+from main.plugins.helpers import get_link, join, set_timer, check_timer, screenshot
 from main.plugins.display_progress import progress_for_pyrogram
 from main.Database.database import Database
 from decouple import config
@@ -34,16 +34,6 @@ async def check_user(id):
     except UserNotParticipantError:
         ok = False
     return ok
-#end
-
-Bot = Client(
-    "save-restricted-bot",
-    bot_token=BOT_TOKEN,
-    api_id=int(API_ID),
-    api_hash=API_HASH
-)
-
-errorC = """How fool is it?\nYou sent me invalid session string.\nHit /logout and /login again with valid pyrogram session string.Hit **Session Button** to generate session string."""
 
 async def get_msg(userbot, client, sender, msg_link, edit):
     msg_id = 0
