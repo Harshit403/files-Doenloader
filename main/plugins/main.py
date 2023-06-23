@@ -182,7 +182,7 @@ async def clone(bot, event):
     if i and h and t is not None:
         try:
             hsb = Client(
-                "save-restricted-bot",
+                f"{event.chat.id}",
                  bot_token=t,
                  api_id=int(i),
                  api_hash=h
