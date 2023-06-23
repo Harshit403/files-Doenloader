@@ -10,7 +10,7 @@ from .. import bot as Drone, bot
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from .. import bot, API_ID, API_HASH, BOT_TOKEN, FORCESUB, ACCESS
 import os
-from main.plugins.helpers import get_link, forcesub, forcesub_text, join, set_timer, check_timer, screenshot
+from main.plugins.helpers import get_link, join, set_timer, check_timer, screenshot
 from main.plugins.display_progress import progress_for_pyrogram
 from main.Database.database import Database
 from decouple import config
