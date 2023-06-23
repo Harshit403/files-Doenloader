@@ -48,21 +48,6 @@ async def join(client, invite_link):
     except Exception as e:
         return f"❌Something went wrong."
         await asyncio.sleep(3)   
-#forcesub-------------------------------------------------------------------------------------------------------------
-
-async def forcesub(bot, sender):
-    FORCESUB = config("FORCESUB", default=None)
-    if not str(FORCESUB).startswith("-100"):
-        FORCESUB = int("-100" + str(FORCESUB))
-    try:
-        user = await bot.get_chat_member(FORCESUB, sender)
-        if user.status == "kicked":
-            return True
-    except UserNotParticipant:
-        return True
-    except Exception as e:
-        print(e)
-        return True
         
 #Regex---------------------------------------------------------------------------------------------------------------
 #to get the url from event
