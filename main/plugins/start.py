@@ -7,7 +7,7 @@ import heroku3
 import sys
 from datetime import datetime
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-from .. import bot, ACCESS, API_HASH, API_ID, AUTH_USERS, UPSTREAM_REPO, HU_APP, APP_NAME, API_KEY, STRINGLOG
+from .. import bot, ACCESS, API_HASH, API_ID, AUTH_USERS, UPSTREAM_REPO, HU_APP, APP_NAME, API_KEY, STRINGLOG, FORCESUB 
 #utils
 import platform
 import math
@@ -71,7 +71,7 @@ async def check_user(user):
     try:
         await bot(
             functions.channels.GetParticipantRequest(
-                channel="pyrogrammers", participant=user
+                channel=FORCESUB, participant=user
             )
         )
         ok = True
