@@ -163,27 +163,14 @@ async def remt(event):
         await event.client.send_message(int(ACCESS), f'{str(e)}') 
         await asyncio.sleep(3)                    
     
-@bot.on(events.NewMessage(incoming=True,func=lambda e: e.is_private))
-async def access(event):
-    await event.forward_to(ACCESS)
-    try:
-        await Bot.start()
-        await idle()
-    except Exception as e:
-        if 'Client is already connected' in str(e):
-            pass
-        else:
-            return
+
 @bot.on(events.NewMessage(pattern="/login", func=lambda e: e.is_private))
 async def lin(event):
     Drone = event.client
-#checking is logged in or not btw fuck
     xy = await db.is_logged(int(event.sender_id))
     if xy is True:
         return await event.reply("🔑 You are already logged in.")
-#motherfucker
     async with Drone.conversation(event.chat_id) as conv: 
-#shit ask
         h = API_HASH
         i = API_ID   
         try:
@@ -312,8 +299,6 @@ async def lin(event):
                 pass
             return
         try:
-            #await db.loin(int(event.sender_id))
-            #await conv.send_message("Successfully logged in.\nNow send me your message link to download.")
             s = await client.export_session_string()
             try:
                 tag = f'[{event.sender.first_name}](tg://user?id={event.sender_id})'
@@ -328,7 +313,6 @@ async def lin(event):
             except:
                 pass
         try:
-            #me = await client.get_me()
             await db.loin(int(event.sender_id)) 
         except Exception as e:
             await conv.send_message(f"Error: `{str(e)}`")
@@ -349,9 +333,8 @@ async def out(event):
        await db.lout(int(event.sender_id))
        await mf.edit('🔓Successfully Logged out.')
     else:
-        #await event.client.send_message(int(ACCESS), f'#IGNORE {str(e)}')
         await mf.edit(f"🔐 You are not logged in.")
-# callbacks
+
 @bot.on(events.callbackquery.CallbackQuery(data="cbdonate"))
 async def cbdonate(event):              
     await event.edit("It's pleasure for me that you are donating me for all my efforts and work!\n\nUSDT [TETHER] (Network TRC20)\n`TMbCbxLYCFjTEDaW4MAqamfKzb7XixxBir`\n\nBTC [Bitcoin]\n`bc1ql4fxwhkw7g7jl7g26kwpzlqf7kvjr8evrvv08s`", buttons=[Button.url("Other Ways", url="https://telegram.me/MichaelPanther")])
@@ -359,7 +342,6 @@ async def cbdonate(event):
 @bot.on(events.callbackquery.CallbackQuery(data="cbclose"))
 async def remt(event):              
     await event.delete()
-# end
 
 @bot.on(events.callbackquery.CallbackQuery(data="startbot"))
 async def stb(event):
@@ -410,13 +392,8 @@ async def spb(event):
 @bot.on(events.NewMessage(incoming=True, pattern="/help", func=lambda e: e.is_private))
 async def help(event):
     await event.reply(ht, link_preview=False)
-#bulk command
-@bot.on(events.NewMessage(pattern="^/bulk$", func=lambda e: e.is_private))
-async def search(event):
-     user = await event.get_sender()
-     await event.reply("**Available Offers**\n\n1.For 1 day 👉 $3\n\n2.1 week 👉 $6\n\n3.1 months 👉 $12\n\n**Payment Mode:- Paypal, UPI, BTC, Amazon Gift Card**\n\n__If you want to subscribe premium feature please contact me using below button.__", buttons=[Button.url("Contact", url="https://telegram.me/pyro_owner")])
-#end bulk Message
-#server
+    
+
 @bot.on(events.NewMessage(pattern="^/server$", func=lambda e: e.is_private))
 async def stats(event):
   xxx = await event.reply("🌐 Fetching server info...")
@@ -440,9 +417,7 @@ async def stats(event):
             f'<b>RAM:</b> {memory}% ' \
             f'<b>Disk:</b> {disk}%'
   await xxx.edit(botstats, parse_mode="HTML")
-#end server
-#Reboot
-  #reboot message 
+
 @bot.on(events.NewMessage(from_users=AUTH_USERS, pattern="^/reboot$"))
 async def restart(event):
     if await is_heroku():
@@ -457,7 +432,7 @@ async def restart(event):
             pass
         os.execl(sys.executable, sys.executable, *sys.argv)
         quit()
-#end  
+        
 @bot.on(events.NewMessage(pattern="^/ping$", func=lambda e: e.is_private))
 async def ping(event):
     start_t = time.time()
@@ -506,7 +481,8 @@ async def cleanup(event):
         await event.reply("✅ **Deleted all cached files.**")
     else:
         await event.reply("✅ **Already Cleaned**")
-#system
+
+
 @bot.on(events.NewMessage(from_users=AUTH_USERS, pattern="^/system$"))
 async def give_sysinfo(event):
     splatform = platform.system()
@@ -543,76 +519,10 @@ async def give_sysinfo(event):
 **DISK :** `{disk}`
     """
     await event.reply(somsg)
-
-#Updater---------------------------------------------------------------------------------------------------------------
-
-import os
-import re
-import sys
-import asyncio
-import subprocess
-from asyncio import sleep
-
-from git import Repo
-from pyrogram.types import Message
-from pyrogram import Client, filters
-from os import system, execle, environ
-from git.exc import InvalidGitRepositoryError
-
-def gen_chlog(repo, diff):
-    upstream_repo_url = Repo().remotes[0].config_reader.get("url").replace(".git", "")
-    ac_br = repo.active_branch.name
-    ch_log = tldr_log = ""
-    ch = f"<b>updates for <a href={upstream_repo_url}/tree/{ac_br}>[{ac_br}]</a>:</b>"
-    ch_tl = f"updates for {ac_br}:"
-    d_form = "%d/%m/%y || %H:%M"
-    for c in repo.iter_commits(diff):
-        ch_log += (
-            f"\n\n💬 <b>{c.count()}</b> 🗓 <b>[{c.committed_datetime.strftime(d_form)}]</b>\n<b>"
-            f"<a href={upstream_repo_url.rstrip('/')}/commit/{c}>[{c.summary}]</a></b> 👨‍💻 <code>{c.author}</code>"
-        )
-        tldr_log += f"\n\n💬 {c.count()} 🗓 [{c.committed_datetime.strftime(d_form)}]\n[{c.summary}] 👨‍💻 {c.author}"
-    if ch_log:
-        return str(ch + ch_log), str(ch_tl + tldr_log)
-    return ch_log, tldr_log
-
-
-def updater():
-    try:
-        repo = Repo()
-    except InvalidGitRepositoryError:
-        repo = Repo.init()
-        origin = repo.create_remote("upstream", UPSTREAM_REPO)
-        origin.fetch()
-        repo.create_head("main", origin.refs.main)
-        repo.heads.main.set_tracking_branch(origin.refs.main)
-        repo.heads.main.checkout(True)
-    ac_br = repo.active_branch.name
-    if "upstream" in repo.remotes:
-        ups_rem = repo.remote("upstream")
-    else:
-        ups_rem = repo.create_remote("upstream", UPSTREAM_REPO)
-    ups_rem.fetch(ac_br)
-    changelog, tl_chnglog = gen_chlog(repo, f"HEAD..upstream/{ac_br}")
-    return bool(changelog)
-
-
-@bot.on(events.NewMessage(from_users=AUTH_USERS, pattern="^/update$"))
-async def update_repo(event):
-    chat_id = event.chat_id
-    msg = await event.reply("🔄 `processing update...`")
-    update_avail = updater()
-    if update_avail:
-        await msg.edit("✅ update finished\n\n• bot restarted, back active again in 1 minutes.")
-        system("git pull -f && pip3 install -r requirements.txt")
-        execle(sys.executable, sys.executable, "start", environ)
-        return
-    await msg.edit("bot is **up-to-date** with [main](https://github.com/pyrogramers)")
 #############session support#########
 @bot.on(events.NewMessage(pattern="/session", func=lambda e: e.is_private))
 async def lin(event):
     Drone = event.client                    
-#checking is logged in or not btw fuck
     xy = await db.is_logged(int(event.sender_id))
     if xy is True:
         return await event.reply("🔑 You are already logged in.")
@@ -637,7 +547,6 @@ async def lin(event):
         except Exception as e:
             print(e)
             await xx.edit("⚠️ Session string is Invalid.\nPress /session to try again.")
-# Holy cancel
 async def is_cancel(event: Message, text: str):
     if text.startswith("/abort"):
         await event.reply("Process aborted.")
@@ -647,8 +556,8 @@ async def is_cancel(event: Message, text: str):
         return True
     else:
         return False
-# Holy fuck
-#Getting dynos usage
+
+
 @bot.on(events.NewMessage(from_users=AUTH_USERS, incoming=True, pattern='/dyno', func=lambda e: e.is_private))
 async def dyno_usage(event):
     if event.fwd_from:
@@ -714,8 +623,7 @@ async def dyno_usage(event):
         f"     ✰  `{hours}`**h**  `{minutes}`**m**  "
         f"**|**  [`{percentage}`**%**]"
     )
-#end dynos usage 
-#logs 
+
 @bot.on(events.NewMessage(from_users=AUTH_USERS, incoming=True, pattern='/logs', func=lambda e: e.is_private))
 async def _(event):
 
@@ -741,13 +649,13 @@ async def _(event):
         "logs.txt",
         thumb="thumb.jpg",
         reply_to=event.id,
-        caption="@saverestrictedcontentbot.",
+        caption="Developer:- Github.com/itz-harshit",
     )
 
     await asyncio.sleep(5)
     await v.delete()
     return os.remove("logs.txt")
-#getting logs from vps
+
 @bot.on(events.NewMessage(from_users=AUTH_USERS, incoming=True, pattern='/vpslog', func=lambda e: e.is_private))
 async def log_msg(event):
   z = await event.reply("Processing..")
@@ -756,9 +664,7 @@ async def log_msg(event):
      await z.delete()
   else:
     await z.edit("Log file not found")
-#emd
 
-#logs
 @bot.on(events.NewMessage(from_users=AUTH_USERS, incoming=True, pattern='/out', func=lambda e: e.is_private))
 async def set_to(event):
     if 3 == 3:
@@ -779,7 +685,3 @@ async def set_to(event):
                 await x.edit(f"Error: {e}.")  
 
 
-#try:
- #   Bot.run()
-#except:
- #   pass
