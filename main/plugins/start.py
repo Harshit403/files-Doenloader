@@ -76,14 +76,11 @@ async def start(event):
     end_t = time.time()
     time_taken_s = (end_t - start_t) * 1000
     if time_taken_s >= 700: 
-        await Dick.edit(f'👋 Hey **{event.sender.first_name}**,\n\nI am Save Restricted Contents Bot, I can save files of restricted channels as well as group.\n\n__Hit /help to learn more.__', 
+        await Dick.edit(f'👋 Hey **{event.sender.first_name}**,\n\nI am Save Contents Bot, I can save files of channels as well as group.\n\n__Hit /help to learn more.__', 
                       buttons=[
-                        [Button.url("📢 Updates Channel", url="https://t.me/Pyrogrammers"),
-                         Button.url("👥 Support Group", url="https://t.me/+e0hay-RhwP45ZjM1")],
-                       
-                        [Button.url("📺 YouTube Channel", url="https://youtube.com/channel/UC2anvk7MNeNzJ6B4c0SZepw")],
-                        [Button.inline("💲 Donate", data="cbdonate"),
-                         Button.inline("🗑️ Close", data="cbclose")]
+                        [Button.url("📢 Updates Channel", url="https://t.me/BotsCraft"),
+                         Button.inline("💲 Donate", data="cbdonate")],
+                        [Button.inline("🗑️ Close", data="cbclose")],
                     ])
         try:
             await Bot.disconnect()
@@ -93,14 +90,11 @@ async def start(event):
         os.execl(sys.executable, sys.executable, *sys.argv)
         quit()
     else:
-        await Dick.edit(f'👋 Hi **{event.sender.first_name}**,\n\nI am Save Restricted Contents Bot, I can save files of restricted channels as well as group.\n\n__Hit /help to learn more.__', 
+        await Dick.edit(f'👋 Hi **{event.sender.first_name}**,\n\nI am Save Contents Bot, I can save files of channels as well as group.\n\n__Hit /help to learn more.__', 
                       buttons=[
-                        [Button.url("📢 Updates Channel", url="https://t.me/pyrogrammers"),
-                         Button.url("👥 Support Group", url="https://t.me/+e0hay-RhwP45ZjM1")],
-                       
-                        [Button.url("📺 YouTube Channel", url="https://youtube.com/channel/UC2anvk7MNeNzJ6B4c0SZepw")],
-                        [Button.inline("💲 Donate", data="cbdonate"),
-                         Button.inline("🗑️ Close", data="cbclose")]
+                        [Button.url("📢 Updates Channel", url="https://t.me/BotsCraft"),
+                         Button.inline("💲 Donate", data="cbdonate")],
+                        [Button.inline("🗑️ Close", data="cbclose")],
                     ])
         if not await check_user(event.sender_id):
             return await Dick.edit(f"Hello {event.sender.first_name}, Due to overload only my channel subscribers can use me.\n\nPlease join my channel and then start me again!", buttons=[Button.url("Join Channel", url=f"https://t.me/{FORCESUB}")])
