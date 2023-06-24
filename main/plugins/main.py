@@ -173,10 +173,23 @@ async def clone(bot, event):
         await event.reply(f'Error: {e}')
     if not await check_user(event.chat.id):
         return await edit.edit(f"Hello {event.chat.first_name}, Due to overload only my channel subscribers can use me.\n\nPlease join my channel and then start me again!", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Join Channel", url=f"https://t.me/{FORCESUB}")]]),)
-
+    bot_token = await db.get_botCreds(event.chat.id)
+    if bot_token:
+        try:
+            JVbot = Client(
+                name=str(bot_token.split(":")[0]),
+                api_hash=API_HASH,
+                api_id=API_ID,
+                bot_token=bot_token)
+            await JVbot.start()
+        except ValueError:
+            return await edit.edit("Your login cridentials are not valid, please /disconnect and /connect again.")
+        except Exception as e:
+            print(e)
+            return await edit.edit(f'{str(e)}')
     if 't.me' in link and not 't.me/c/' in link and not 't.me/+' in link:
         try:
-            await get_msg(bot, Bot, event.chat.id, link, edit)
+            await get_msg(bot, JVbot, event.chat.id, link, edit)
         except FloodWait as e:
             await asyncio.sleep(e.value)
         except ValueError as v:
@@ -207,20 +220,6 @@ async def clone(bot, event):
             return await edit.edit(f'{str(e)}')
     else:
         return await edit.edit("⚠️You are not logged in.\nHit /login to log in to the bot.")
-    bot_token = await db.get_botCreds(event.chat.id)
-    if bot_token:
-        try:
-            JVbot = Client(
-                name=str(bot_token.split(":")[0]),
-                api_hash=API_HASH,
-                api_id=API_ID,
-                bot_token=bot_token)
-            await JVbot.start()
-        except ValueError:
-            return await edit.edit("Your login cridentials are not valid, please /disconnect and /connect again.")
-        except Exception as e:
-            print(e)
-            return await edit.edit(f'{str(e)}')
     if 't.me/+' in link:
         xy = await join(userbot, link)
         await edit.edit(xy)
