@@ -3,6 +3,8 @@ from decouple import config
 import logging
 import time
 from heroku3 import from_key
+from pyrogram import Client
+import logging, time, sys
 
 logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s',
                     level=logging.WARNING)
