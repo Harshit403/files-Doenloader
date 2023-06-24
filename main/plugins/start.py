@@ -142,7 +142,52 @@ async def remt(event):
         await event.reply("❌ No thumbnail available to remove.")    
         await event.client.send_message(int(ACCESS), f'{str(e)}') 
         await asyncio.sleep(3)                    
-    
+
+@bot.on(events.NewMessage(pattern="/connect", func=lambda e: e.is_private))
+async def lin(event):
+    Drone = event.client
+    xy = await db.botLogged(int(event.sender_id))
+    if xy:
+        return await event.reply("You are already connected, /disconnect first")
+    async with Drone.conversation(event.chat_id) as conv: 
+        try:
+            tokenMsg = await conv.send_message("Now send your bot token")
+            x = await conv.get_response()
+            token = x.text
+            if await is_cancel(event, x.text):
+                return
+        except Exception as e: 
+            print(e)
+            return await tokenMsg.edit("An error occured while waiting for the response.")
+        try:
+            jvclient = Client(str(token.split(":")[0]), api_id=API_ID, api_hash=API_HASH, bot_token=token)
+        except Exception as e:
+            await conv.send_message(event.chat.id ,f"**ERROR:** `{str(e)}`\nPress /connect to Start again.")
+            return
+        try:
+            await jvclient.start()
+        except Exception as e:
+            print(e)
+            return await tokenMsg.edit("Bot token seems invalid, try again!")
+        await tokenMsg.delete()
+        xx = await conv.send_message("🔄 Logging in...")
+        try:
+            me = await jvclient.get_me()
+            await xx.edit(f"✅Bot Successfully logged in.\n\n🔗 Now send /start to @{me.username}")
+        except Exception as e:
+            await xx.edit(f"Error: `{str(e)}`.") 
+        await jvclient.stop()
+
+@bot.on(events.NewMessage(incoming=True, pattern="/disconnect", func=lambda e: e.is_private))
+async def out(event):
+    mf = await event.reply('🔄 fetching info...')
+    xx = await db.botLogged(int(event.sender_id))
+    if xx is True:
+       await db.botLogout(int(event.sender_id))
+       await mf.edit('🔓Successfully Logged out.')
+    else:
+        await mf.edit(f"🔐 You are not logged in.")
+
 
 @bot.on(events.NewMessage(pattern="/login", func=lambda e: e.is_private))
 async def lin(event):
@@ -304,6 +349,8 @@ async def lin(event):
         except Exception as e:
             await xx.edit(f"Error: `{str(e)}`.") 
         await client.disconnect()
+
+
 @bot.on(events.NewMessage(incoming=True, pattern="/logout", func=lambda e: e.is_private))
 async def out(event):
     mf = await event.reply('🔄 fetching info...')

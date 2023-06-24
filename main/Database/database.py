@@ -70,7 +70,28 @@ class Database:
         h = user.get('api_hash', None)
         s = user.get('session', None)
         return i, h, s 
-   
+    
+    async def botLogged(self, id):
+        user = await self.col.find_one({'id': "bot"+str(id)})
+        if user:
+            return True
+        else:
+            return False
+    
+    async def set_botCreds(self, id, bot_token):
+        await self.col.insert_one({'id': "bot"+str(id), 'bot_token': bot_token})
+    
+    async def get_botCreds(self, id):
+        user = await self.col.find_one({'id': "bot"+str(id)})
+        if user:
+            token = user.get('bot_token', None)
+            return token
+        else:
+            return None
+    
+    async def botLogout(self, id):
+        await self.col.delete_many({'id': "bot"+str(id)})
+    
     async def loin(self, id):
         await self.col.update_one({'id': id}, {'$set': {'log': True}})
     

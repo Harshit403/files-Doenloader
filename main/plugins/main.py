@@ -38,6 +38,12 @@ async def check_user(id):
 async def get_msg(userbot, client, sender, msg_link, edit):
     msg_id = 0
     try:
+        await client.get_chat(sender)
+    except:
+        me = await client.get_me()
+        await edit.edit(f"🚫 You need to start a chat with @{me.username} first.")
+        return None
+    try:
         msg_id = int(msg_link.split("/")[-1])
     except ValueError:
         if '?single' in msg_link:
@@ -189,7 +195,7 @@ async def clone(bot, event):
     if i and h and s is not None:
         try:
             userbot = Client(
-                name="saverestricted",
+                name=s[0:15],
                 session_string=s,
                 api_hash=h,
                 api_id=int(i))
@@ -201,13 +207,27 @@ async def clone(bot, event):
             return await edit.edit(f'{str(e)}')
     else:
         return await edit.edit("⚠️You are not logged in.\nHit /login to log in to the bot.")
+    bot_token = await db.get_botCreds(event.chat.id)
+    if bot_token:
+        try:
+            JVbot = Client(
+                name=str(bot_token.split(":")[0]),
+                api_hash=API_HASH,
+                api_id=API_ID,
+                bot_token=bot_token)
+            await JVbot.start()
+        except ValueError:
+            return await edit.edit("Your login cridentials are not valid, please /disconnect and /connect again.")
+        except Exception as e:
+            print(e)
+            return await edit.edit(f'{str(e)}')
     if 't.me/+' in link:
         xy = await join(userbot, link)
         await edit.edit(xy)
         return 
     if 't.me/c' in link:
         try:
-            await get_msg(userbot, Bot, event.chat.id, link, edit)
+            await get_msg(userbot, JVbot, event.chat.id, link, edit)
         except BadRequest.CHANNEL_INVALID:
             return await edit.edit('Join the channel first.')
             await asyncio.sleep(2)
@@ -217,5 +237,5 @@ async def clone(bot, event):
             return await edit.edit(f'Error: `{str(e)}`')
             await asyncio.sleep(2)         
         except (ChannelBanned, ChannelInvalid, ChannelPrivate, ChatIdInvalid, ChatInvalid):
-            await edit.edit(sender, edit_id, "Send Invite Link First.")
+            await edit.edit("Send Invite Link First.")
             await asyncio.sleep(2)
