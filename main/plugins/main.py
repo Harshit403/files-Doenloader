@@ -285,9 +285,6 @@ async def clone(bot, event):
     if 't.me/c' in link:
         try:
             await get_msg(userbot, JVbot, event.chat.id, link, edit)
-        except BadRequest.CHANNEL_INVALID:
-            return await edit.edit('Join the channel first.')
-            await asyncio.sleep(2)
         except FloodWait as e:
             await asyncio.sleep(e.value)
         except Exception as e:
