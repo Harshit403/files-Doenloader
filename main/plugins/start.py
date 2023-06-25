@@ -162,7 +162,7 @@ async def lin(event):
         try:
             jvclient = Client(str(token.split(":")[0]), api_id=API_ID, api_hash=API_HASH, bot_token=token)
         except Exception as e:
-            await conv.send_message(event.chat.id ,f"**ERROR:** `{str(e)}`\nPress /connect to Start again.")
+            await conv.send_message(chat_id ,f"**ERROR:** `{str(e)}`\nPress /connect to Start again.")
             return
         try:
             await jvclient.start()
@@ -171,6 +171,7 @@ async def lin(event):
             return await tokenMsg.edit("Bot token seems invalid, try again!")
         await tokenMsg.delete()
         xx = await conv.send_message("🔄 Logging in...")
+        await db.set_botCreds(event.chat_id, token)
         try:
             me = await jvclient.get_me()
             await xx.edit(f"✅Bot Successfully logged in.\n\n🔗 Now send /start to @{me.username}")
