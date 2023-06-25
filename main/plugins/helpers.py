@@ -26,10 +26,11 @@ async def join(client, invite_link):
         await client.join_chat(invite_link)
         return "✅Channel joined Successfully."
         await asyncio.sleep(3)
-    except FloodWait:
-        return "FloodWait error, please try again later."
-        await asyncio.sleep(3)
+    except FloodWait as f:
+        return f"Bot is limited by telegram for {f.value} seconds."
+        await asyncio.sleep(f.value)
     except Exception as e:
+        print(e)
         return f"❌Something went wrong."
         await asyncio.sleep(3)   
         
@@ -56,8 +57,8 @@ async def set_timer(bot, sender, list1, list2):
     now = time.time()
     list2.append(f'{now}')
     list1.append(f'{sender}')
-    await bot.send_message(sender, 'You can start a new process again after 11 minutes.\n__To overcome these limitations, please contact [@Pyro_owner](https://t.me/pyro_owner) to upgrade to the Premium Plan.__')
-    await asyncio.sleep(660)
+    await bot.send_message(sender, 'Bot is sleeping for 25 seconds to avoid telegram limitations.')
+    await asyncio.sleep(25)
     list2.pop(int(list2.index(f'{now}')))
     list1.pop(int(list1.index(f'{sender}')))
     
@@ -67,7 +68,7 @@ def check_timer(sender, list1, list2):
         index = list1.index(f'{sender}')
         last = list2[int(index)]
         present = time.time()
-        return False, f"Please wait {660-round(present-float(last))} seconds to get next message.\n__To overcome these limitations, please contact [@Pyro_owner](https://t.me/pyro_owner) to upgrade to the Premium Plan.__"
+        return False, f"Please wait {25-round(present-float(last))} seconds to forward a new message."
     else:
         return True, None
 
