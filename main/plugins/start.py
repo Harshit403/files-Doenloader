@@ -159,22 +159,22 @@ async def lin(event):
         except Exception as e: 
             print(e)
             return await tokenMsg.edit("An error occured while waiting for the response.")
+        xx = await conv.send_message("🔄 connecting...")
         try:
             jvclient = Client(str(token.split(":")[0]), api_id=API_ID, api_hash=API_HASH, bot_token=token, in_memory=True)
         except Exception as e:
-            await conv.send_message(chat_id ,f"**ERROR:** `{str(e)}`\nPress /connect to Start again.")
+            await xx.edit(f"**ERROR:** `{str(e)}`\nPress /connect to Start again.")
             return
         try:
             await jvclient.start()
         except Exception as e:
             print(e)
-            return await tokenMsg.edit("Bot token seems invalid, try again!")
+            return await xx.edit("Bot token seems invalid, try again!")
         await tokenMsg.delete()
-        xx = await conv.send_message("🔄 Logging in...")
         await db.set_botCreds(event.chat_id, token)
         try:
             me = await jvclient.get_me()
-            await xx.edit(f"✅Bot Successfully logged in.\n\n🔗 Now send /start to @{me.username}")
+            await xx.edit(f"✅Bot Successfully connected.\nNow send /start to @{me.username}")
         except Exception as e:
             await xx.edit(f"Error: `{str(e)}`.") 
         await jvclient.stop()
