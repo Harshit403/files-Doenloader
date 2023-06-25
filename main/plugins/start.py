@@ -72,11 +72,11 @@ async def check_user(user):
 @bot.on(events.NewMessage(incoming=True, pattern='/start', func=lambda e: e.is_private))
 async def start(event):
     start_t = time.time()
-    Dick= await event.reply("Intialising...")
+    Dick= await event.reply("🚆")
     end_t = time.time()
     time_taken_s = (end_t - start_t) * 1000
     if time_taken_s >= 700: 
-        await Dick.edit(f'Hey **{event.sender.first_name}**,\n\nI am Save Contents Bot, the most powerful and stable Contents downloader telegram bot.\nI can save files of any chat doesn't matter it's type and anything.', 
+        await Dick.edit(f"Hey **{event.sender.first_name}**,\n\nI am Save Contents Bot, the most powerful and stable Contents downloader telegram bot.\nI can save files of any chat doesn't matter it's type and anything.", 
                       buttons=[
                         [Button.url("📢 Updates Channel", url="https://t.me/BotsCraft"),
                          Button.inline("💲 Donate", data="cbdonate")],
@@ -90,7 +90,7 @@ async def start(event):
         os.execl(sys.executable, sys.executable, *sys.argv)
         quit()
     else:
-        await Dick.edit(f'Hi **{event.sender.first_name}**,\n\nI am Save Contents Bot, the most powerful and stable Contents downloader telegram bot.\nI can save files of any chat doesn't matter it's type and anything.', 
+        await Dick.edit(f"Hi **{event.sender.first_name}**,\n\nI am Save Contents Bot, the most powerful and stable Contents downloader telegram bot.\nI can save files of any chat doesn't matter it's type and anything.", 
                       buttons=[
                         [Button.url("📢 Updates Channel", url="https://t.me/BotsCraft"),
                          Button.inline("💲 Donate", data="cbdonate")],
