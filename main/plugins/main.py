@@ -19,6 +19,7 @@ from pyrogram.errors import FloodWait, BadRequest
 from pyrogram import Client, filters, idle
 import re, time, asyncio, logging
 from PyHarshit.tg.extractor import videoMetaData
+from PyHarshit.tg.Control import uploadFile
 
 logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s',
                     level=logging.WARNING)
@@ -69,7 +70,16 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             msg = await userbot.get_messages(chat, msg_id)
             if msg.media: 
                 if msg.media == MessageMediaType.WEB_PAGE:
-                    #----------))))))))😂 
+                    edit = await edit.edit('⏳')
+                    await client.send_message(sender, msg.text.markdown)
+                    await edit.delete()
+                    return
+             if not msg.media:
+                if msg.text:
+                    edit = await edit.edit("Forwarding...")
+                    await client.send_message(sender, msg.text.markdown)
+                    await edit.delete()
+                    return
             edit = await edit.edit('Processing...')
             file = await userbot.download_media(
                 msg,
@@ -85,7 +95,31 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             caption = str(file)
             if msg.caption is not None:
                 caption = msg.caption
-            if str(file).split(".")[-1] in ['mkv', 'mp4', 'webm']:
+            caption_entities = msg.caption_entities 
+            if msg.media==MessageMediaType.VIDEO_NOTE: 
+                 round_message = True 
+                 print("Trying to get metadata") 
+                 data = videoMetaData(file) 
+                 height, width, duration = data["height"], data["width"], data["duration"] 
+                 print(f'd: {duration}, w: {width}, h:{height}') 
+                 try: 
+                     thumb_path = await screenshot(file, duration, sender) 
+                 except Exception: 
+                     thumb_path = None 
+                 await client.send_video_note( 
+                     chat_id=sender, 
+                     video_note=file, 
+                     length=height, duration=duration,  
+                     thumb=thumb_path, 
+                     progress=progress_for_pyrogram, 
+                     progress_args=( 
+                         client, 
+                         'Uploading...\n', 
+                         edit, 
+                         time.time() 
+                     ) 
+                 )
+            elif msg.media==MessageMediaType.VIDEO and msg.video.mime_type in ["video/mp4", "video/x-matroska"]:
                 if str(file).split(".")[-1] in ['webm', 'mkv']:
                     path = str(file).split(".")[0] + ".mp4"
                     os.rename(file, path) 
@@ -132,7 +166,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                     progress=progress_for_pyrogram,
                     progress_args=(
                         client,
-                        '<b><u>Uploading...</b></u>\n',
+                        'Uploading...\n',
                         edit,
                         time.time()
                     )
@@ -140,9 +174,20 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             me = await client.get_me()
             await edit.edit(f'Your file has been forwarded to @{me.username}.')
             await set_timer(Bot, sender, process, timer)
-        except Exception as e:
-            await edit.edit(F'ERROR: {str(e)}')
+            try:
+                os.remove(file)
+                if os.path.isfile(file) == True:
+                    os.remove(file)
+            except Exception:
+                pass
+            await edit.delete()
+        except (ChannelBanned, ChannelInvalid, ChannelPrivate, ChatIdInvalid, ChatInvalid):
+            await edit.edit("There is a problem in your source channel.")
             return
+        except Exception as e:
+            await edit.edit(e)
+            return
+            
     else:
         st, r = check_timer(sender, process, timer) 
         if st == False:
