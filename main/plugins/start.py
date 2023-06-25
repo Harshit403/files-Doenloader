@@ -151,7 +151,7 @@ async def lin(event):
         return await event.reply("You are already connected, /disconnect first")
     async with Drone.conversation(event.chat_id) as conv: 
         try:
-            tokenMsg = await conv.send_message("Now, send me your Bot Token to connect your bot\n\nTap on Below button then hit /newbot and follow further instructions, you will get your bot token forward that to me.", buttons=[Button.url("🤖 Bot Father", url="https://t.me/BotFather")])
+            tokenMsg = await conv.send_message("Now, send me your Bot Token to connect your bot\n\n`Tap on Below button then hit /newbot and follow further instructions, you will get your bot token forward that to me.`", buttons=[Button.url("🤖 Bot Father", url="https://t.me/BotFather")])
             x = await conv.get_response()
             token = x.text
             if await is_cancel(event, x.text):
@@ -174,7 +174,7 @@ async def lin(event):
         await db.set_botCreds(event.chat_id, token)
         try:
             me = await jvclient.get_me()
-            await xx.edit(f"✅Bot Successfully connected.\nNow send /start to @{me.username}")
+            await xx.edit(f"✅Bot Successfully connected.\nNow start the @{me.username}, return back to me and send your message link.", buttons=[Button.url("Start Bot", url=f"https://t.me/{me.username}")])
         except Exception as e:
             await xx.edit(f"Error: `{str(e)}`.") 
         await jvclient.stop()
