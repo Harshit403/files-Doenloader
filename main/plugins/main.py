@@ -102,17 +102,20 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                         time.time()
                     )
                 )
-                await edit.delete()
+                me = await client.get_me()
+                await edit.edit(f'Your file has been forwarded to @{me.username}')
                 await set_timer(Bot, sender, process, timer)
             elif str(file).split(".")[-1] in ['jpg', 'jpeg', 'png', 'webp']:
                 await edit.edit("Uploading image file...")
                 await client.send_photo(sender, file, caption=caption)
-                await edit.delete()
+                me = await client.get_me()
+                await edit.edit(f'Your file has been forwarded to @{me.username}')
                 await set_timer(Bot, sender, process, timer)
             elif str(file).split(".")[-1] in ['mp3', 'ogg', 'wav', 'm4a', 'Flac', 'AAC']:
                 await edit.edit("Uploading Audio File...")
                 await client.send_audio(sender, file, caption=caption)
-                await edit.delete() 
+                me = await client.get_me()
+                await edit.edit(f'Your file has been forwarded to @{me.username}') 
                 await set_timer(Bot, sender, process, timer)
             else:
                 await client.send_document(
@@ -127,9 +130,9 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                         time.time()
                     )
                 )
-            await edit.delete()
+            me = await client.get_me()
+            await edit.edit(f'Your file has been forwarded to @{me.username}')
             await set_timer(Bot, sender, process, timer)
-            #await client.stop()
         except Exception as e:
             await edit.edit(F'ERROR: {str(e)}')
             return
@@ -141,8 +144,9 @@ async def get_msg(userbot, client, sender, msg_link, edit):
         chat =  msg_link.split("/")[-2]
         try:
             await client.copy_message(int(sender), chat, msg_id)
-            await edit.delete()
-            await set_timer(client, sender, process, timer)
+            me = await client.get_me()
+            await edit.edit(f'Your file has been forwarded to @{me.username}')
+            await set_timer(Bot, sender, process, timer)
         except FloodWait as f: 
             return await edit.edit(f"Bot is limited by telegram for {f.value + 2} seconds.")
             await asyncio.sleep(f.value)
