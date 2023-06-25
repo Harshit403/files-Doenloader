@@ -104,7 +104,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                 )
             elif str(file).split(".")[-1] in ['jpg', 'jpeg', 'png', 'webp']:
                 await edit.edit("Uploading image file...")
-                await bot.send_file(sender, file, caption=caption)
+                await client.send_photo(sender, file, caption=caption)
                 await edit.delete()
                 await set_timer(client, sender, process, timer)
             elif str(file).split(".")[-1] in ['mp3', 'ogg', 'wav', 'm4a', 'Flac', 'AAC']:
@@ -141,20 +141,15 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             await client.copy_message(int(sender), chat, msg_id)
             await edit.delete()
             await set_timer(client, sender, process, timer)
-        except FloodWait as f:
-            try: 
-                await get_pmsg(userbot, bot, sender, msg_link, edit)
-            except Exception as e:
-                print(e) 
-                return await edit.edit(f"Bot is limited by telegram for {f.value + 2} seconds.\nPlease wait until then or upgrade to premium plan by contacting @pyro_owner to remove these limitations.")
-                await asyncio.sleep(f.value)
+        except FloodWait as f: 
+            return await edit.edit(f"Bot is limited by telegram for {f.value + 2} seconds.")
+            await asyncio.sleep(f.value)
         except Exception as e:
             if "Empty messages cannot be copied" in str(e):
                 group = await userbot.get_users(chat)
                 group_link = f't.me/c/{int(group.id)}/{int(msg_id)}'
                 return await get_msg(userbot, client, bot, sender, edit_id, msg_link, i)
             else:
-                print(e)
                 print(e)
                 return await edit.edit(sender, f'{str(e)}')
         except (ChannelBanned, ChannelInvalid, ChannelPrivate, ChatIdInvalid, ChatInvalid):
@@ -187,25 +182,25 @@ async def clone(bot, event):
                 in_memory=True)
             await JVbot.start()
         except ValueError:
-            return await edit.edit("Your login cridentials are not valid, please /disconnect and /connect again.")
+            return await edit.edit("Your bot token is not valid, please /disconnect and /connect again.")
         except Exception as e:
             print(e)
             return await edit.edit(f'{str(e)}')
     else:
-        return await edit.edit("Please add your bot using /connect")
+        return await edit.edit("⚠️Your bot is not connected yet.\nHit /connect to connect the bot.")
     if 't.me' in link and not 't.me/c/' in link and not 't.me/+' in link:
         try:
             await get_msg(bot, JVbot, event.chat.id, link, edit)
         except FloodWait as e:
             await asyncio.sleep(e.value)
         except ValueError as v:
-            return await edit.edit(f'`{str(v)}` Only message link allowed.\nMay be your message contains `?single` remove this word from your link and try again')
+            return await edit.edit(f'`{str(v)}`')
             await asyncio.sleep(2)
         except Exception as e:
             return await edit.edit(f'Error: `{str(e)}`')   
             await asyncio.sleep(2)      
         except FloodWait as e:
-            return await edit.edit(f"Bot is limited by telegram for {e.value + 2} seconds.\nPlease wait until then or upgrade to premium plan by contacting @pyro_owner to remove these limitations. ")
+            return await edit.edit(f"Bot is limited by telegram for {e.value + 2} seconds.")
 
     userbot = ""
     i, h, s = await db.get_credentials(event.chat.id)
@@ -241,5 +236,5 @@ async def clone(bot, event):
             return await edit.edit(f'Error: `{str(e)}`')
             await asyncio.sleep(2)         
         except (ChannelBanned, ChannelInvalid, ChannelPrivate, ChatIdInvalid, ChatInvalid):
-            await edit.edit("Send Invite Link First.")
+            await edit.edit("Send Invite Link of your private chat first.")
             await asyncio.sleep(2)
