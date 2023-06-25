@@ -73,7 +73,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                     await client.send_message(sender, msg.text.markdown)
                     me = await client.get_me()
                     await edit.edit(f'Your file has been forwarded to @{me.username}.')
-                    await set_timer(Bot, sender, process, timer)
+                    #await set_timer(Bot, sender, process, timer)
                     return
             if not msg.media:
                 if msg.text:
@@ -81,7 +81,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                     await client.send_message(sender, msg.text.markdown)
                     me = await client.get_me()
                     await edit.edit(f'Your file has been forwarded to @{me.username}.')
-                    await set_timer(Bot, sender, process, timer)
+                    #await set_timer(Bot, sender, process, timer)
                     return
             edit = await edit.edit('Processing...')
             file = await userbot.download_media(
@@ -122,6 +122,9 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                          time.time() 
                      ) 
                  )
+            me = await client.get_me()
+            await edit.edit(f'Your file has been forwarded to @{me.username}.')
+            #await set_timer(Bot, sender, process, timer)
             elif msg.media==MessageMediaType.VIDEO and msg.video.mime_type in ["video/mp4", "video/x-matroska"]:
                 if str(file).split(".")[-1] in ['webm', 'mkv']:
                     path = str(file).split(".")[0] + ".mp4"
@@ -148,19 +151,19 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                 )
                 me = await client.get_me()
                 await edit.edit(f'Your file has been forwarded to @{me.username}.')
-                await set_timer(Bot, sender, process, timer)
+                #await set_timer(Bot, sender, process, timer)
             elif str(file).split(".")[-1] in ['jpg', 'jpeg', 'png', 'webp']:
                 await edit.edit("Uploading image file...")
                 await client.send_photo(sender, file, caption=caption)
                 me = await client.get_me()
                 await edit.edit(f'Your file has been forwarded to @{me.username}.')
-                await set_timer(Bot, sender, process, timer)
+                #await set_timer(Bot, sender, process, timer)
             elif str(file).split(".")[-1] in ['mp3', 'ogg', 'wav', 'm4a', 'Flac', 'AAC']:
                 await edit.edit("Uploading Audio File...")
                 await client.send_audio(sender, file, caption=caption)
                 me = await client.get_me()
                 await edit.edit(f'Your file has been forwarded to @{me.username}.') 
-                await set_timer(Bot, sender, process, timer)
+                #await set_timer(Bot, sender, process, timer)
             else:
                 await client.send_document(
                     sender,
@@ -176,7 +179,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                 )
             me = await client.get_me()
             await edit.edit(f'Your file has been forwarded to @{me.username}.')
-            await set_timer(Bot, sender, process, timer)
+            #await set_timer(Bot, sender, process, timer)
             try:
                 os.remove(file)
                 if os.path.isfile(file) == True:
