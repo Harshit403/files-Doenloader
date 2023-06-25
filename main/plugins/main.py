@@ -122,8 +122,8 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                          time.time() 
                      ) 
                  )
-            me = await client.get_me()
-            await edit.edit(f'Your file has been forwarded to @{me.username}.')
+                 me = await client.get_me()
+                 await edit.edit(f'Your file has been forwarded to @{me.username}.')
             #await set_timer(Bot, sender, process, timer)
             elif msg.media==MessageMediaType.VIDEO and msg.video.mime_type in ["video/mp4", "video/x-matroska"]:
                 if str(file).split(".")[-1] in ['webm', 'mkv']:
