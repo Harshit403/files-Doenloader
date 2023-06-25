@@ -126,10 +126,11 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                     )
                 )
             await edit.delete()
-            await set_timer(client, sender, process, timer) 
+            await set_timer(client, sender, process, timer)
+            await client.stop()
         except Exception as e:
             await edit.edit(F'ERROR: {str(e)}')
-            return 
+            return
     else:
         st, r = check_timer(sender, process, timer) 
         if st == False:
@@ -173,6 +174,8 @@ async def clone(bot, event):
         await event.reply(f'Error: {e}')
     if not await check_user(event.chat.id):
         return await edit.edit(f"Hello {event.chat.first_name}, Due to overload only my channel subscribers can use me.\n\nPlease join my channel and then start me again!", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Join Channel", url=f"https://t.me/{FORCESUB}")]]),)
+    MONGODB_URI = config("MONGODB_URI", default=None)
+    db = Database(MONGODB_URI, 'saverestricted')
     bot_token = await db.get_botCreds(event.chat.id)
     if bot_token:
         try:
@@ -202,8 +205,6 @@ async def clone(bot, event):
             return await edit.edit(f"Bot is limited by telegram for {e.value + 2} seconds.\nPlease wait until then or upgrade to premium plan by contacting @pyro_owner to remove these limitations. ")
 
     userbot = ""
-    MONGODB_URI = config("MONGODB_URI", default=None)
-    db = Database(MONGODB_URI, 'saverestricted')
     i, h, s = await db.get_credentials(event.chat.id)
     if i and h and s is not None:
         try:
