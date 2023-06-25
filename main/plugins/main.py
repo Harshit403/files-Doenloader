@@ -183,7 +183,8 @@ async def clone(bot, event):
                 name=str(bot_token.split(":")[0]),
                 api_hash=API_HASH,
                 api_id=API_ID,
-                bot_token=bot_token)
+                bot_token=bot_token,
+                in_memory=True)
             await JVbot.start()
         except ValueError:
             return await edit.edit("Your login cridentials are not valid, please /disconnect and /connect again.")
@@ -214,7 +215,8 @@ async def clone(bot, event):
                 name=s[0:15],
                 session_string=s,
                 api_hash=h,
-                api_id=int(i))
+                api_id=int(i),
+                in_memory=True)
             await userbot.start()
         except ValueError:
             return await edit.edit("Your login cridentials are not valid, please /logout and /login again.")
