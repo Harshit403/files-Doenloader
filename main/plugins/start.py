@@ -76,7 +76,7 @@ async def start(event):
     end_t = time.time()
     time_taken_s = (end_t - start_t) * 1000
     if time_taken_s >= 700: 
-        await Dick.edit(f'👋 Hey **{event.sender.first_name}**,\n\nI am Save Contents Bot, I can save files of channels as well as group.\n\n__Hit /help to learn more.__', 
+        await Dick.edit(f'Hey **{event.sender.first_name}**,\n\nI am Save Contents Bot, the most powerful and stable Contents downloader telegram bot.\nI can save files of any chat doesn't matter it's type and anything.', 
                       buttons=[
                         [Button.url("📢 Updates Channel", url="https://t.me/BotsCraft"),
                          Button.inline("💲 Donate", data="cbdonate")],
@@ -90,7 +90,7 @@ async def start(event):
         os.execl(sys.executable, sys.executable, *sys.argv)
         quit()
     else:
-        await Dick.edit(f'👋 Hi **{event.sender.first_name}**,\n\nI am Save Contents Bot, I can save files of channels as well as group.\n\n__Hit /help to learn more.__', 
+        await Dick.edit(f'Hi **{event.sender.first_name}**,\n\nI am Save Contents Bot, the most powerful and stable Contents downloader telegram bot.\nI can save files of any chat doesn't matter it's type and anything.', 
                       buttons=[
                         [Button.url("📢 Updates Channel", url="https://t.me/BotsCraft"),
                          Button.inline("💲 Donate", data="cbdonate")],
@@ -151,7 +151,7 @@ async def lin(event):
         return await event.reply("You are already connected, /disconnect first")
     async with Drone.conversation(event.chat_id) as conv: 
         try:
-            tokenMsg = await conv.send_message("Now send your bot token")
+            tokenMsg = await conv.send_message("Now, send me your Bot Token to connect your bot\n\nTap on Below button then hit /newbot and follow further instructions, you will get your bot token forward that to me.", buttons=[Button.url("🤖 Bot Father", url="https://t.me/BotFather")])
             x = await conv.get_response()
             token = x.text
             if await is_cancel(event, x.text):
@@ -185,9 +185,9 @@ async def out(event):
     xx = await db.botLogged(int(event.sender_id))
     if xx is True:
        await db.botLogout(int(event.sender_id))
-       await mf.edit('🔓Successfully Logged out.')
+       await mf.edit('🔓Successfully disconnected from bot.')
     else:
-        await mf.edit(f"🔐 You are not logged in.")
+        await mf.edit(f"🔐 Your bot is not connected yet.")
 
 
 @bot.on(events.NewMessage(pattern="/login", func=lambda e: e.is_private))
@@ -371,7 +371,7 @@ async def cbdonate(event):
 async def remt(event):              
     await event.delete()
 
-@bot.on(events.callbackquery.CallbackQuery(data="startbot"))
+@bot.on(events.NewMessage(incoming=True, pattern="/startbot", func=lambda e: e.is_private))
 async def stb(event):
     await event.edit("Starting")
     MONGODB_URI = config("MONGODB_URI", default=None)
@@ -385,19 +385,19 @@ async def stb(event):
                 api_id=int(i))
             await userbot.start()
             await idle()
-            await event.edit("Started!")
+            await event.reply("Started!")
         except ValueError:
-            return await event.edit("⚠️Login expired, Please login again.")
+            return await event.reply("⚠️Login expired, Please login again.")
         except Exception as e:
             print(e)
             if 'Client is already connected' in str(e):
-                return await event.edit("Already running.")
+                return await event.reply("Already running.")
             else:
-                return await event.edit(f"Error: {str(e)}")
+                return await event.reply(f"Error: {str(e)}")
     else:
-        return await event.edit("⚠️Login expired, Please login again.")
+        return await event.reply("⚠️Login expired, Please login again.")
     
-@bot.on(events.callbackquery.CallbackQuery(data="stopbot"))
+@bot.on(events.NewMessage(incoming=True, pattern="/stopbot", func=lambda e: e.is_private))
 async def spb(event):   
     MONGODB_URI = config("MONGODB_URI", default=None)
     db = Database(MONGODB_URI, 'saverestricted')
@@ -409,13 +409,13 @@ async def spb(event):
                 api_hash=h,
                 api_id=int(i))
             await userbot.stop()
-            await event.edit("Bot stopped!")
+            await event.reply("Bot stopped!")
         except ValueError:
-            return await event.edit("⚠️Login expired, Please login again.")
+            return await event.reply("⚠️Login expired, Please login again.")
         except Exception as e:
-            return await event.edit(f"Error: {str(e)}")
+            return await event.reply(f"Error: {str(e)}")
     else:
-        return await event.edit("⚠️Login expired, Please login again.")
+        return await event.reply("⚠️Login expired, Please login again.")
 
 @bot.on(events.NewMessage(incoming=True, pattern="/help", func=lambda e: e.is_private))
 async def help(event):
