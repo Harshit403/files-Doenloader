@@ -104,19 +104,19 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                 )
                 me = await client.get_me()
                 await edit.edit(f'Your file has been forwarded to @{me.username}')
-                await set_timer(Bot, sender, process, timer)
+                await set_timer(client, sender, process, timer)
             elif str(file).split(".")[-1] in ['jpg', 'jpeg', 'png', 'webp']:
                 await edit.edit("Uploading image file...")
                 await client.send_photo(sender, file, caption=caption)
                 me = await client.get_me()
                 await edit.edit(f'Your file has been forwarded to @{me.username}')
-                await set_timer(Bot, sender, process, timer)
+                await set_timer(client, sender, process, timer)
             elif str(file).split(".")[-1] in ['mp3', 'ogg', 'wav', 'm4a', 'Flac', 'AAC']:
                 await edit.edit("Uploading Audio File...")
                 await client.send_audio(sender, file, caption=caption)
                 me = await client.get_me()
                 await edit.edit(f'Your file has been forwarded to @{me.username}') 
-                await set_timer(Bot, sender, process, timer)
+                await set_timer(client, sender, process, timer)
             else:
                 await client.send_document(
                     sender,
@@ -132,7 +132,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                 )
             me = await client.get_me()
             await edit.edit(f'Your file has been forwarded to @{me.username}')
-            await set_timer(Bot, sender, process, timer)
+            await set_timer(client, sender, process, timer)
         except Exception as e:
             await edit.edit(F'ERROR: {str(e)}')
             return
@@ -146,7 +146,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             await client.copy_message(int(sender), chat, msg_id)
             me = await client.get_me()
             await edit.edit(f'Your file has been forwarded to @{me.username}')
-            await set_timer(Bot, sender, process, timer)
+            await set_timer(client, sender, process, timer)
         except FloodWait as f: 
             return await edit.edit(f"Bot is limited by telegram for {f.value + 2} seconds.")
             await asyncio.sleep(f.value)
@@ -154,7 +154,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             if "Empty messages cannot be copied" in str(e):
                 group = await userbot.get_users(chat)
                 group_link = f't.me/c/{int(group.id)}/{int(msg_id)}'
-                return await get_msg(userbot, client, bot, sender, edit_id, msg_link, i)
+                return await get_msg(userbot, JVbot, bot, sender, edit_id, msg_link, i)
             else:
                 print(e)
                 return await edit.edit(sender, f'{str(e)}')
