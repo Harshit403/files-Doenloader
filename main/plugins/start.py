@@ -1,7 +1,7 @@
 from asyncio.exceptions import TimeoutError
 from pyrogram import filters, Client, idle
 from pyrogram.types import Message
-import os
+import os, asyncio 
 import requests
 import heroku3
 import sys
