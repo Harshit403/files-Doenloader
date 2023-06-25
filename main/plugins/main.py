@@ -74,7 +74,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                     await client.send_message(sender, msg.text.markdown)
                     await edit.delete()
                     return
-             if not msg.media:
+            if not msg.media:
                 if msg.text:
                     edit = await edit.edit("Forwarding...")
                     await client.send_message(sender, msg.text.markdown)
