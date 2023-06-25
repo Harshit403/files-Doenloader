@@ -160,7 +160,7 @@ async def lin(event):
             print(e)
             return await tokenMsg.edit("An error occured while waiting for the response.")
         try:
-            jvclient = Client(str(token.split(":")[0]), api_id=API_ID, api_hash=API_HASH, bot_token=token)
+            jvclient = Client(str(token.split(":")[0]), api_id=API_ID, api_hash=API_HASH, bot_token=token, in_memory=True)
         except Exception as e:
             await conv.send_message(chat_id ,f"**ERROR:** `{str(e)}`\nPress /connect to Start again.")
             return
