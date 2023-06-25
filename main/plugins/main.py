@@ -71,13 +71,17 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                 if msg.media == MessageMediaType.WEB_PAGE:
                     edit = await edit.edit('⏳')
                     await client.send_message(sender, msg.text.markdown)
-                    await edit.delete()
+                    me = await client.get_me()
+                    await edit.edit(f'Your file has been forwarded to @{me.username}.')
+                    await set_timer(Bot, sender, process, timer)
                     return
             if not msg.media:
                 if msg.text:
                     edit = await edit.edit("Forwarding...")
                     await client.send_message(sender, msg.text.markdown)
-                    await edit.delete()
+                    me = await client.get_me()
+                    await edit.edit(f'Your file has been forwarded to @{me.username}.')
+                    await set_timer(Bot, sender, process, timer)
                     return
             edit = await edit.edit('Processing...')
             file = await userbot.download_media(
