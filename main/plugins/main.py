@@ -36,7 +36,11 @@ async def check_user(id):
     return ok
 
 async def get_msg(userbot, client, sender, msg_link, edit):
+    edit = "" 
+    chat = "" 
+    round_message = False 
     msg_id = 0
+    height, width, duration, thumb_path = 90, 90, 0, None
     try:
         await client.get_chat(sender)
     except:
@@ -63,6 +67,9 @@ async def get_msg(userbot, client, sender, msg_link, edit):
         file = ""
         try:
             msg = await userbot.get_messages(chat, msg_id)
+            if msg.media: 
+                if msg.media == MessageMediaType.WEB_PAGE:
+                    #----------))))))))😂 
             edit = await edit.edit('Processing...')
             file = await userbot.download_media(
                 msg,
