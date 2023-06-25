@@ -37,7 +37,6 @@ async def check_user(id):
     return ok
 
 async def get_msg(userbot, client, sender, msg_link, edit):
-    edit = "" 
     chat = "" 
     round_message = False 
     msg_id = 0
