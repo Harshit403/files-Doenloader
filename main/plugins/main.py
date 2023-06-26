@@ -100,6 +100,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                 )
             )
             await edit.edit('⚪ Uploading...')
+            caption = None
             if msg.caption is not None:
                 caption = msg.caption
             caption_entities = msg.caption_entities 
@@ -154,12 +155,12 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                         time.time()
                     )
                 )
-                try:
-                    await edit.delete()
-                except:
-                    pass
                 me = await client.get_me()
-                await Bot.send_message(sender, 'Your file has been forwarded to @{me.username}.')
+                try:
+                    await edit.edit(f'Your file has been Forwarded to @{me.username}.')
+                except:
+                    #pass
+                    await Bot.send_message(sender, 'Your file has been forwarded to @{me.username}.')
                 #await edit.edit(f'Your file has been forwarded to @{me.username}.')
                 #await set_timer(Bot, sender, process, timer)
             elif str(file).split(".")[-1] in ['jpg', 'jpeg', 'png', 'webp']:
