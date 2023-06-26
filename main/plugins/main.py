@@ -100,7 +100,6 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                 )
             )
             await edit.edit('⚪ Uploading...')
-            caption = str(file)
             if msg.caption is not None:
                 caption = msg.caption
             caption_entities = msg.caption_entities 
@@ -143,6 +142,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                     chat_id=sender,
                     video=file,
                     caption=caption,
+                    caption_entities=caption_entities,
                     supports_streaming=True,
                     duration=duration,
                     thumb=thumb_path,
