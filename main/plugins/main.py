@@ -66,7 +66,12 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             chat = int('-100' + str(msg_link.split("/")[-2]))
         file = ""
         try:
-            msg = await userbot.get_messages(chat, msg_id)
+            try:
+                msg = await userbot.get_messages(chat, msg_id)
+            except FloodWait as f:
+                await edit.edit(f'Bot is sleeping for {f.value} seconds due to telegram limitations.')
+            except Exception as e:
+                await edit.edit(e)
             if msg.media: 
                 if msg.media == MessageMediaType.WEB_PAGE:
                     edit = await edit.edit('⏳')
@@ -149,8 +154,13 @@ async def get_msg(userbot, client, sender, msg_link, edit):
                         time.time()
                     )
                 )
+                try:
+                    await edit.delete()
+                except:
+                    pass
                 me = await client.get_me()
-                await edit.edit(f'Your file has been forwarded to @{me.username}.')
+                await Bot.send_message(sender, 'Your file has been forwarded to @{me.username}.')
+                #await edit.edit(f'Your file has been forwarded to @{me.username}.')
                 #await set_timer(Bot, sender, process, timer)
             elif str(file).split(".")[-1] in ['jpg', 'jpeg', 'png', 'webp']:
                 await edit.edit("Uploading image file...")
