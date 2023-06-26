@@ -78,9 +78,7 @@ async def start(event):
     if time_taken_s >= 700: 
         await Dick.edit(f"Hey **{event.sender.first_name}**,\n\nI am Save Contents Bot, the most powerful and stable Contents downloader telegram bot.\nI can save files of any chat doesn't matter it's type and anything.", 
                       buttons=[
-                        [Button.url("📢 Updates Channel", url="https://t.me/BotsCraft"),
-                         Button.inline("💲 Donate", data="cbdonate")],
-                        [Button.inline("🗑️ Close", data="cbclose")],
+                        [Button.url("📢 Updates Channel", url="https://t.me/BotsCraft")],
                     ])
         try:
             await Bot.disconnect()
@@ -92,9 +90,7 @@ async def start(event):
     else:
         await Dick.edit(f"Hi **{event.sender.first_name}**,\n\nI am Save Contents Bot, the most powerful and stable Contents downloader telegram bot.\nI can save files of any chat doesn't matter it's type and anything.", 
                       buttons=[
-                        [Button.url("📢 Updates Channel", url="https://t.me/BotsCraft"),
-                         Button.inline("💲 Donate", data="cbdonate")],
-                        [Button.inline("🗑️ Close", data="cbclose")],
+                        [Button.url("📢 Updates Channel", url="https://t.me/BotsCraft")],
                     ])
         if not await check_user(event.sender_id):
             return await Dick.edit(f"Hello {event.sender.first_name}, Due to overload only my channel subscribers can use me.\n\nPlease join my channel and then start me again!", buttons=[Button.url("Join Channel", url=f"https://t.me/{FORCESUB}")])
