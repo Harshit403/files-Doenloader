@@ -57,8 +57,9 @@ async def set_timer(bot, sender, list1, list2):
     now = time.time()
     list2.append(f'{now}')
     list1.append(f'{sender}')
-    await bot.send_message(sender, '`Bot is sleeping for 23 seconds to avoid telegram limitations.`')
+    fuck = await bot.send_message(sender, '`Bot is sleeping for 23 seconds to avoid telegram limitations.`')
     await asyncio.sleep(25)
+    await fuck.edit('`Now you can forward a new message again.`')
     list2.pop(int(list2.index(f'{now}')))
     list1.pop(int(list1.index(f'{sender}')))
     
