@@ -45,7 +45,7 @@ async def get_msg(userbot, client, sender, msg_link, edit):
         await client.get_chat(sender)
     except:
         me = await client.get_me()
-        await edit.edit(f"🚫 You need to start a chat with @{me.username} first.")
+        await edit.edit(f"👀 You need to start a chat with @{me.username} first.")
         return None
     try:
         msg_id = int(msg_link.split("/")[-1])
