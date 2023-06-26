@@ -149,13 +149,20 @@ async def lin(event):
         try:
             tokenMsg = await conv.send_message("Now, send me your Bot Token to connect your bot\n\n`Tap on Below button then hit /newbot and follow further instructions, you will get your bot token forward that to me.`", buttons=[Button.url("🤖 Bot Father", url="https://t.me/BotFather")])
             x = await conv.get_response()
-            token = x.text
+            match = re.search(r"\b([0-9]+:[\w-]+)", x.text) 
+            if match: 
+                token = match.group(1) 
+                print("Bot Token:", token) 
+            else: 
+                print("No bot token found.") 
+                await event.reply('BOT TOKEN not found in the message.') 
+                return
             if await is_cancel(event, x.text):
                 return
         except Exception as e: 
             print(e)
             return await tokenMsg.edit("An error occured while waiting for the response.")
-        xx = await conv.send_message("🔄 connecting...")
+        xx = await conv.send_message("🔄 Connecting...")
         try:
             jvclient = Client(str(token.split(":")[0]), api_id=API_ID, api_hash=API_HASH, bot_token=token, in_memory=True)
         except Exception as e:
