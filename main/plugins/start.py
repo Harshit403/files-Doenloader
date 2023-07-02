@@ -137,8 +137,8 @@ async def remt(event):
     except Exception as e:
         await event.reply("❌ No thumbnail available to remove.")    
         await event.client.send_message(int(ACCESS), f'{str(e)}') 
-        await asyncio.sleep(3)                    
-
+        await asyncio.sleep(3)  
+        
 @bot.on(events.NewMessage(pattern="/connect", func=lambda e: e.is_private))
 async def lin(event):
     Drone = event.client
@@ -181,6 +181,7 @@ async def lin(event):
         except Exception as e:
             await xx.edit(f"Error: `{str(e)}`.") 
         await jvclient.stop()
+
 
 @bot.on(events.NewMessage(incoming=True, pattern="/disconnect", func=lambda e: e.is_private))
 async def out(event):
