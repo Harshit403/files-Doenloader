@@ -40,7 +40,7 @@ async def is_heroku():
 
 downloads = os.path.realpath("main/downloads")
 raw = os.path.realpath(".")
-ht = """**Steps to Login to the Bot**\n\n`1. Hit `/login` to the bot.`\n`2. Enter your Telegram phone number.`\n`3. Enter OTP recieved on telegram app.`\n`4. Enter 2FA passcode if asking`\n\n`Boom! You are logged in to bot.`\n\n**Steps for Connecting Your Bot**\n`1. Hit` /connect `in` @SaveContentsBot.\n`2. Now go to `@BotFather\n`3. In` @BotFather `hit /newbot`\n`4. Enter any relevant bot name.`\n`5. Enter username for bot.`\n`6. You will get Bot Token, forward that token to` @SaveContentsBot.\n\n`Now you can send message link to me so that i can save it for you.`"""
+ht = """--**Steps to Login to the Bot**--\n\n`1. Hit `/login` to the bot.`\n`2. Enter your Telegram phone number.`\n`3. Enter OTP recieved on telegram app.`\n`4. Enter 2FA passcode if asking`\n\n`Boom! You are logged in to bot.`\n\n--**Steps for Connecting Your Bot**--\n\n`1. Hit` /connect `in` @SaveContentsBot.\n`2. Now go to `@BotFather\n`3. In` @BotFather `hit /newbot`\n`4. Enter any relevant bot name.`\n`5. Enter username for bot.`\n`6. You will get Bot Token, forward that token to` @SaveContentsBot.\n\n`Now you can send message link to me so that i can save it for you.`"""
 
 #human bytes
 def humanbytes(size):
