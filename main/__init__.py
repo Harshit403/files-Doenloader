@@ -33,7 +33,7 @@ API_ID = getenv_int("API_ID", "4680197")
 API_HASH = os.getenv("API_HASH", "495b0228624028d635bd748b22985f67")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 FORCESUB = os.getenv("FORCESUB")
-MONGODB_URI = os.getenv("MONGODB_URI" "")
+MONGODB_URI = os.getenv("MONGODB_URI" "mongodb+srv://itsharshit_db_user:QJhxnouQBv07eLcB@cluster0.hcrawmw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 LOGS = getenv_int("LOGS", -1001790160966)
 AUTH_USERS = getenv_int_list("AUTH_USERS", "7477152489")
 
