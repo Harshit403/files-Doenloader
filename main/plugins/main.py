@@ -7,7 +7,7 @@ from telethon import events, Button
 from telethon.tl.functions.users import GetFullUserRequest
 from telethon.errors.rpcerrorlist import UserNotParticipantError
 from telethon.tl.functions.channels import GetParticipantRequest
-from .. import bot, API_ID, API_HASH, BOT_TOKEN, FORCESUB, ACCESS, Bot
+from .. import bot, API_ID, API_HASH, BOT_TOKEN, FORCESUB, Bot
 from ..plugins.helpers import get_link, join, set_timer, check_timer
 from ..plugins.display_progress import progress_for_pyrogram
 from ..Database.database import Database
