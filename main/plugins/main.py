@@ -1,13 +1,16 @@
-# main.py
-
-import os, time, asyncio, re, cv2
+import os
+import time
+import asyncio
+import re
+import cv2
+import logging
 from pyrogram import Client, filters
 from pyrogram.enums import MessageMediaType
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-from pyrogram.errors import FloodWait, BadRequest, ChannelPrivate, UsernameInvalid, PeerIdInvalid, ChatAdminRequired
+from pyrogram.errors import FloodWait, BadRequest, ChannelPrivate, UsernameInvalid, PeerIdInvalid
 
 from .. import bot, API_ID, API_HASH, BOT_TOKEN, FORCESUB, Bot
-from ..plugins.helpers import get_link, join, set_timer, check_timer, check_private_channel_access
+from ..plugins.helpers import get_link, join, set_timer, check_timer
 from ..plugins.display_progress import progress_for_pyrogram
 from ..Database.database import Database
 from main.plugins.dbstuff import db
@@ -68,45 +71,36 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             chat_id = username
             is_private = False
         else:
-            await edit.edit('❌ Unsupported link format.')
+            await edit.edit('❌ Unsupported link.')
             return
     except (ValueError, IndexError):
-        await edit.edit('❌ Invalid message link format.')
+        await edit.edit('❌ Invalid message link.')
         return
 
-    # Pre-check for private channel access
-    if is_private:
-        await edit.edit('🔍 Checking access to private channel/group...')
-        if not await check_private_channel_access(userbot, chat_id):
-            await edit.edit(
-                f'❌ Access Denied to Channel ID: `{chat_id}`\n\n'
-                'Your user account cannot access this private channel/group.\n\n'
-                '**Solutions:**\n'
-                '1. Join the channel/group with this user account.\n'
-                '2. If already a member, try leaving and re-joining.\n'
-                '3. The channel may have restrictions on content access.'
-            )
-            return
-
+    # 🔧 FIX: Resolve the chat first to avoid PeerIdInvalid
     try:
-        msg = await userbot.get_messages(chat_id, msg_id)
-    except PeerIdInvalid:
-        # This can happen if the check above passes but get_messages still fails
-        await edit.edit(
-            f'❌ Peer ID Invalid: `{chat_id}`\n\n'
-            'Could not fetch the message. This is a strict access error.\n'
-            'Ensure your user account is a member and not restricted.'
-        )
-        return
-    except (ChannelPrivate, UsernameInvalid, BadRequest) as e:
-        await edit.edit(f'❌ Cannot access message: `{e}`')
+        resolved_chat = await userbot.get_chat(chat_id)
+        # Optional: log resolved title for debugging
+        # print(f"Resolved chat: {resolved_chat.title} ({resolved_chat.id})")
+    except (ChannelPrivate, UsernameInvalid, PeerIdInvalid, BadRequest) as e:
+        await edit.edit(f'❌ Cannot access chat: {e}')
         return
     except Exception as e:
-        await edit.edit(f'❌ Failed to fetch message: `{e}`')
+        await edit.edit(f'❌ Failed to resolve chat: {e}')
+        return
+
+    # Now fetch the message
+    try:
+        msg = await userbot.get_messages(chat_id, msg_id)
+    except (ChannelPrivate, UsernameInvalid, PeerIdInvalid, BadRequest) as e:
+        await edit.edit(f'❌ Cannot access message: {e}')
+        return
+    except Exception as e:
+        await edit.edit(f'❌ Failed to fetch message: {e}')
         return
 
     if not msg.media and not msg.text and not msg.caption:
-        await edit.edit('⚠️ Message has no forwardable content.')
+        await edit.edit('⚠️ Message has no content.')
         return
 
     # Try direct copy for public chats
@@ -119,43 +113,41 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             me = await client.get_me()
             await edit.edit(f'✅ Forwarded to @{me.username}.')
             return
+        except (ChannelPrivate, BadRequest, PeerIdInvalid):
+            pass  # fallback to download
         except Exception as e:
-            # If direct copy fails, we will fall back to download
-            await edit.edit(f'⚠️ Direct copy failed, trying download method... Error: {e}')
+            await edit.edit(f'⚠️ Copy failed, falling back to download: {e}')
 
-    # --- Fallback: download + re-upload ---
-    file = None
-    thumb_path = None
+    # Fallback: download + re-upload
+    file = await userbot.download_media(
+        msg,
+        progress=progress_for_pyrogram,
+        progress_args=(userbot, '📥 Downloading…', edit, time.time())
+    )
+    if not file:
+        await edit.edit('❌ Failed to download media.')
+        return
+
+    caption = msg.caption or ''
+    entities = msg.caption_entities
+    await edit.edit('📤 Uploading…')
+
     try:
-        await edit.edit('📥 Downloading media...')
-        file = await userbot.download_media(
-            msg,
-            progress=progress_for_pyrogram,
-            progress_args=(userbot, '📥 Downloading…', edit, time.time())
-        )
-        if not file:
-            await edit.edit('❌ Failed to download media. The file might be inaccessible or deleted.')
-            return
-
-        caption = msg.caption or ''
-        entities = msg.caption_entities
-        await edit.edit('📤 Uploading…')
-
         if msg.video_note:
             meta = video_meta(file)
-            thumb_path = await gen_thumb(file, f'{sender}.jpg')
+            thumb = await gen_thumb(file, f'{sender}.jpg')
             await client.send_video_note(
                 sender, file, length=meta['height'], duration=meta['duration'],
-                thumb=thumb_path, progress=progress_for_pyrogram,
+                thumb=thumb, progress=progress_for_pyrogram,
                 progress_args=(client, '📤 Uploading…', edit, time.time())
             )
         elif msg.video:
             meta = video_meta(file)
-            thumb_path = await gen_thumb(file, f'{sender}.jpg')
+            thumb = await gen_thumb(file, f'{sender}.jpg')
             await client.send_video(
                 sender, file, caption=caption, caption_entities=entities,
                 duration=meta['duration'], width=meta['width'], height=meta['height'],
-                thumb=thumb_path, progress=progress_for_pyrogram,
+                thumb=thumb, progress=progress_for_pyrogram,
                 progress_args=(client, '📤 Uploading…', edit, time.time())
             )
         elif msg.photo:
@@ -168,28 +160,20 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             await client.send_document(sender, file, caption=caption, caption_entities=entities,
                                        progress=progress_for_pyrogram,
                                        progress_args=(client, '📤 Uploading…', edit, time.time()))
-
-        me = await client.get_me()
-        await edit.edit(f'✅ Forwarded to @{me.username}.')
-
-    except PeerIdInvalid:
-        # This is the most likely place for the error to occur during download
-        await edit.edit(
-            f'❌ Download Failed: Peer ID Invalid `{chat_id}`\n\n'
-            'Your account can see the channel but is restricted from downloading media.\n'
-            'This is a channel-specific setting that cannot be bypassed.'
-        )
     except FloodWait as fw:
         await asyncio.sleep(fw.value)
         await edit.edit(f'⚠️ FloodWait: Retry after {fw.value} seconds.')
     except Exception as e:
-        await edit.edit(f'❌ An error occurred during processing: `{e}`')
-    finally:
-        # --- Clean up temporary files ---
-        if file and os.path.isfile(file):
-            os.remove(file)
-        if thumb_path and os.path.isfile(thumb_path):
-            os.remove(thumb_path)
+        await edit.edit(f'❌ Upload failed: {e}')
+    else:
+        me = await client.get_me()
+        await edit.edit(f'✅ Forwarded to @{me.username}.')
+
+    # Cleanup
+    if os.path.isfile(file):
+        os.remove(file)
+    if os.path.isfile(f'{sender}.jpg'):
+        os.remove(f'{sender}.jpg')
 
 
 @Bot.on_message(filters.private & filters.incoming)
@@ -251,8 +235,7 @@ async def clone_handler(bot_, event: Message):
             await asyncio.sleep(fw.value)
             await init.edit(f'⏳ Retry after {fw.value} seconds.')
         except Exception as e:
-            # This is the final catch-all, should not be reached if get_msg handles everything
-            await init.edit(f'💥 Unexpected critical error: {e}')
+            await init.edit(f'💥 Unexpected error: {e}')
 
     await userbot.stop()
     await jvbot.stop()
