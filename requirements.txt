@@ -1,18 +1,9 @@
-PyHarshit
-python-decouple
-pyrogram
-telethon
-tgcrypto
-pymongo
-motor
-pymongo[srv]
-dnspython
-heroku3
-pyromod
-TgCrypto
-psutil
-wget
-gitpython
-hachoir
-numpy
-Pillow
+telethon==1.31.1
+pyrogram==2.0.106
+tgcrypto==1.2.5
+python-dotenv==1.0.0
+motor==3.3.2          # or pymongo==4.6.1
+psutil==5.9.5
+requests==2.31.0
+opencv-python==4.8.1.78
+ffmpeg-python==0.2.0  # optional wrapper; ffmpeg binary still required
