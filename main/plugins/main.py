@@ -2,7 +2,7 @@ import os, time, asyncio, re, cv2
 from pyrogram import Client, filters
 from pyrogram.enums import MessageMediaType
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-from pyrogram.errors import FloodWait, BadRequest, ChannelPrivate, UsernameInvalid, PeerIdInvalid
+from pyrogram.errors import FloodWait, BadRequest, ChannelPrivate, UsernameInvalid, PeerIdInvalid, ChatAdminRequired
 
 from .. import bot, API_ID, API_HASH, BOT_TOKEN, FORCESUB, Bot
 from ..plugins.helpers import get_link, join, set_timer, check_timer
@@ -46,6 +46,14 @@ async def gen_thumb(video, out):
         return out
     return None
 
+async def check_channel_access(userbot, chat_id):
+    """Check if user has access to the channel"""
+    try:
+        await userbot.get_chat(chat_id)
+        return True
+    except (ChannelPrivate, UsernameInvalid, PeerIdInvalid, ChatAdminRequired):
+        return False
+
 async def get_msg(userbot, client, sender, msg_link, edit):
     chat_id = None
     msg_id = None
@@ -71,10 +79,33 @@ async def get_msg(userbot, client, sender, msg_link, edit):
         await edit.edit('❌ Invalid message link.')
         return
 
+    # Check if user has access to private channels
+    if is_private:
+        await edit.edit('🔍 Checking access to private channel...')
+        if not await check_channel_access(userbot, chat_id):
+            await edit.edit(
+                '❌ You don\'t have access to this private channel/group.\n\n'
+                'Possible solutions:\n'
+                '1. Make sure you have joined the private channel/group\n'
+                '2. Try using a different user account that has access\n'
+                '3. Check if the link is correct and not expired'
+            )
+            return
+
     try:
         msg = await userbot.get_messages(chat_id, msg_id)
     except (ChannelPrivate, UsernameInvalid, PeerIdInvalid, BadRequest) as e:
-        await edit.edit(f'❌ Cannot access message: {e}')
+        # Provide more detailed error information and solutions
+        if is_private:
+            await edit.edit(
+                f'❌ Cannot access private channel/group: {e}\n\n'
+                'Possible solutions:\n'
+                '1. Make sure you have joined the private channel/group\n'
+                '2. Try using a different user account that has access\n'
+                '3. Check if the link is correct and not expired'
+            )
+        else:
+            await edit.edit(f'❌ Cannot access message: {e}')
         return
     except Exception as e:
         await edit.edit(f'❌ Failed to fetch message: {e}')
@@ -100,11 +131,20 @@ async def get_msg(userbot, client, sender, msg_link, edit):
             await edit.edit(f'⚠️ Copy failed, falling back to download: {e}')
 
     # Fallback: download + re-upload
-    file = await userbot.download_media(
-        msg,
-        progress=progress_for_pyrogram,
-        progress_args=(userbot, '📥 Downloading…', edit, time.time())
-    )
+    try:
+        file = await userbot.download_media(
+            msg,
+            progress=progress_for_pyrogram,
+            progress_args=(userbot, '📥 Downloading…', edit, time.time())
+        )
+    except Exception as e:
+        await edit.edit(f'❌ Failed to download media: {e}\n\n'
+                       'This might be because:\n'
+                       '1. You don\'t have access to this content\n'
+                       '2. The content has been deleted\n'
+                       '3. Your account is restricted')
+        return
+        
     if not file:
         await edit.edit('❌ Failed to download media.')
         return
