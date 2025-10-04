@@ -24,10 +24,10 @@ StartTime = time.time()
 
 def _is_cancel(event, text: str):
     if text.startswith("/abort"):
-        await event.reply("Process aborted.")
+        event.reply("Process aborted.")
         return True
-    elif text.startswith("/"):  # Bot Commands
-        await event.reply("Cancelled the generation process!")
+    elif text.startswith("/"):
+        event.reply("Cancelled the generation process!")
         return True
     else:
         return False
