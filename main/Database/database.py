@@ -1,105 +1,117 @@
-
-import datetime
+"""
+MongoDB helper for saverestricted bot
+Reads MONGODB_URI from parent package – no decouple needed.
+"""
+from typing import Optional, AsyncGenerator
 import motor.motor_asyncio
 from .. import MONGODB_URI
 
 SESSION_NAME = 'saverestricted'
 
 class Database:
-  
-#Connection--------------------------------------------------------------------
+    """Async helper for users + bot-tokens + login flags."""
 
-    def __init__(self, MONGODB_URI, SESSION_NAME):
-        self._client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_URI)
-        self.db = self._client[SESSION_NAME]
-        self.col = self.db.users
+    def __init__(self, uri: str = MONGODB_URI, name: str = SESSION_NAME) -> None:
+        self._cli = motor.motor_asyncio.AsyncIOMotorClient(uri)
+        self._db = self._cli[name]
+        self._users = self._db.users
+        # speed
+        self._users.create_index('id', unique=True)
 
-#collection handling---------------------------------------------------------
+    # ------------------------------------------------------------------
+    # internal helpers
+    # ------------------------------------------------------------------
+    async _update(self, uid: int, payload: dict) -> None:
+        await self._users.update_one({'id': uid}, {'$set': payload}, upsert=True)
 
-    def new_user(self, id):
-        return dict(id=id, banned=False, api_id=None, api_hash=None, session=None)
-           
-    async def add_user(self,id):
-        user = self.new_user(id)
-        await self.col.insert_one(user)
-      
-    async def is_user_exist(self, id):
-        user = await self.col.find_one({'id':int(id)})
-        return True if user else False
+    async _rem_field(self, uid: int, field: str) -> None:
+        await self._users.update_one({'id': uid}, {'$unset': {field: 1}})
 
-    async def total_users_count(self):
-        count = await self.col.count_documents({})
-        return count
+    # ------------------------------------------------------------------
+    # users
+    # ------------------------------------------------------------------
+    def _new_user(self, uid: int) -> dict:
+        return {'id': uid, 'banned': False, 'api_id': None,
+                'api_hash': None, 'session': None, 'log': False}
 
-    async def banning(self, id):
-        await self.col.update_one({'id': id}, {'$set': {'banned': True}})
-    
-    async def is_banned(self, id):
-        user = await self.col.find_one({'id': int(id)})
-        banned = user.get('banned', False)
-        return banned
-      
-    async def unbanning(self, id):
-        await self.col.update_one({'id': id}, {'$set': {'banned': False}})
-        
-    async def get_users(self):
-        users = self.col.find({})
-        return users
-    
-    async def update_session(self, id, session):
-        await self.col.update_one({'id': id}, {'$set': {'session': session}})
-    
-    async def rem_session(self, id):
-        await self.col.update_one({'id': id}, {'$set': {'session': None}})
-   
-    async def update_api_id(self, id, api_id):
-        await self.col.update_one({'id': id}, {'$set': {'api_id': api_id}})
-    
-    async def rem_api_id(self, id):
-        await self.col.update_one({'id': id}, {'$set': {'api_id': None}})
-        
-    async def update_api_hash(self, id, api_hash):
-        await self.col.update_one({'id': id}, {'$set': {'api_hash': api_hash}})
-    
-    async def rem_api_hash(self, id):
-        await self.col.update_one({'id': id}, {'$set': {'api_hash': None}})
-        
-    async def get_credentials(self, id):
-        user = await self.col.find_one({'id':int(id)})
-        i = user.get('api_id', None)
-        h = user.get('api_hash', None)
-        s = user.get('session', None)
-        return i, h, s 
-    
-    async def botLogged(self, id):
-        user = await self.col.find_one({'id': "bot"+str(id)})
-        if user:
-            return True
-        else:
-            return False
-    
-    async def set_botCreds(self, id, bot_token):
-        await self.col.insert_one({'id': "bot"+str(id), 'bot_token': bot_token})
-    
-    async def get_botCreds(self, id):
-        user = await self.col.find_one({'id': "bot"+str(id)})
-        if user:
-            token = user.get('bot_token', None)
-            return token
-        else:
-            return None
-    
-    async def botLogout(self, id):
-        await self.col.delete_many({'id': "bot"+str(id)})
-    
-    async def loin(self, id):
-        await self.col.update_one({'id': id}, {'$set': {'log': True}})
-    
-    async def is_logged(self, id):
-        user = await self.col.find_one({'id': int(id)})
-        banned = user.get('log', False)
-        return banned
-      
-    async def lout(self, id):
-        await self.col.update_one({'id': id}, {'$set': {'log': False}})
+    async def add_user(self, uid: int) -> None:
+        await self._users.insert_one(self._new_user(uid))
 
+    async def is_user_exist(self, uid: int) -> bool:
+        return bool(await self._users.find_one({'id': uid}))
+
+    async def total_users_count(self) -> int:
+        return await self._users.estimated_document_count()
+
+    async def get_users(self) -> AsyncGenerator[dict, None]:
+        async for doc in self._users.find({}):
+            yield doc
+
+    # ------------------------------------------------------------------
+    # ban
+    # ------------------------------------------------------------------
+    async def banning(self, uid: int) -> None:
+        await self._update(uid, {'banned': True})
+
+    async def unbanning(self, uid: int) -> None:
+        await self._update(uid, {'banned': False})
+
+    async def is_banned(self, uid: int) -> bool:
+        user = await self._users.find_one({'id': uid})
+        return user.get('banned', False) if user else False
+
+    # ------------------------------------------------------------------
+    # api / session
+    # ------------------------------------------------------------------
+    async def update_api_id(self, uid: int, api_id: int) -> None:
+        await self._update(uid, {'api_id': api_id})
+
+    async def rem_api_id(self, uid: int) -> None:
+        await self._rem_field(uid, 'api_id')
+
+    async def update_api_hash(self, uid: int, api_hash: str) -> None:
+        await self._update(uid, {'api_hash': api_hash})
+
+    async def rem_api_hash(self, uid: int) -> None:
+        await self._rem_field(uid, 'api_hash')
+
+    async def update_session(self, uid: int, session: str) -> None:
+        await self._update(uid, {'session': session})
+
+    async def rem_session(self, uid: int) -> None:
+        await self._rem_field(uid, 'session')
+
+    async def get_credentials(self, uid: int) -> tuple[Optional[int], Optional[str], Optional[str]]:
+        user = await self._users.find_one({'id': uid})
+        if not user:
+            return None, None, None
+        return user.get('api_id'), user.get('api_hash'), user.get('session')
+
+    # ------------------------------------------------------------------
+    # login flag
+    # ------------------------------------------------------------------
+    async def loin(self, uid: int) -> None:
+        await self._update(uid, {'log': True})
+
+    async def lout(self, uid: int) -> None:
+        await self._update(uid, {'log': False})
+
+    async def is_logged(self, uid: int) -> bool:
+        user = await self._users.find_one({'id': uid})
+        return user.get('log', False) if user else False
+
+    # ------------------------------------------------------------------
+    # connected bot token
+    # ------------------------------------------------------------------
+    async def set_botCreds(self, uid: int, token: str) -> None:
+        await self._users.insert_one({'id': f'bot{uid}', 'bot_token': token})
+
+    async def get_botCreds(self, uid: int) -> Optional[str]:
+        doc = await self._users.find_one({'id': f'bot{uid}'})
+        return doc.get('bot_token') if doc else None
+
+    async def botLogged(self, uid: int) -> bool:
+        return bool(await self._users.find_one({'id': f'bot{uid}'}))
+
+    async def botLogout(self, uid: int) -> None:
+        await self._users.delete_many({'id': f'bot{uid}'})
