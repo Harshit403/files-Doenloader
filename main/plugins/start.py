@@ -12,7 +12,7 @@ from .. import (bot, FORCESUB, API_HASH, API_ID, AUTH_USERS,
 from ..Database.database import Database
 from ..plugins.helpers import login, logout
 from ..plugins.dbstuff import db
-from ..utils_bot import (readable_time, get_readable_file_size,
+from ..utils import (readable_time, get_readable_file_size,
                          is_cancel as _is_cancel)
 
 logging.basicConfig(format="[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s",
