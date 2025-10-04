@@ -1,99 +1,69 @@
+import os, time, asyncio, subprocess, re
+from pyrogram import Client, filters
+from pyrogram.errors import FloodWait
 from main.Database.database import Database
-from pyrogram import Client, filters, idle
-from pyrogram.errors import FloodWait, BadRequest
-from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant
-import asyncio, subprocess, re, os, time
-from decouple import config
+from .. import API_ID, API_HASH, MONGODB_URI
 
-#Multi client-------------------------------------------------------------------------------------------------------------
-async def login(sender, i, h, s):
-    MONGODB_URI = config("MONGODB_URI", default=None)
+# ---------- login / logout ----------
+async def login(uid: int, api_id: int, api_hash: str, session: str) -> None:
     db = Database(MONGODB_URI, 'saverestricted')
-    await db.update_api_id(sender, i)
-    await db.update_api_hash(sender, h)
-    await db.update_session(sender, s)
-    
-async def logout(sender):
-    MONGODB_URI = config("MONGODB_URI", default=None)
-    db = Database(MONGODB_URI, 'saverestricted')
-    await db.rem_api_id(sender)
-    await db.rem_api_hash(sender)
-    await db.rem_session(sender)
-   
-#Join private chat-------------------------------------------------------------------------------------------------------------
-async def join(client, invite_link):
-    try:
-        await client.join_chat(invite_link)
-        return "✅Channel joined Successfully."
-        await asyncio.sleep(3)
-    except FloodWait as f:
-        return f"Bot is limited by telegram for {f.value} seconds."
-        await asyncio.sleep(f.value)
-    except Exception as e:
-        print(e)
-        return f"❌Something went wrong."
-        await asyncio.sleep(3)   
-        
-        
-#Regex---------------------------------------------------------------------------------------------------------------
-#to get the url from event
+    await asyncio.gather(
+        db.update_api_id(uid, api_id),
+        db.update_api_hash(uid, api_hash),
+        db.update_session(uid, session)
+    )
 
-def get_link(string):
-    regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
-    url = re.findall(regex,string)   
+async def logout(uid: int) -> None:
+    db = Database(MONGODB_URI, 'saverestricted')
+    await asyncio.gather(
+        db.rem_api_id(uid),
+        db.rem_api_hash(uid),
+        db.rem_session(uid)
+    )
+
+# ---------- join ----------
+async def join(client: Client, invite: str) -> str:
     try:
-        link = [x[0] for x in url][0]
-        if link:
-            return link
-        else:
-            return False
+        await client.join_chat(invite)
+        await asyncio.sleep(1)
+        return "✅ Joined successfully."
+    except FloodWait as fw:
+        await asyncio.sleep(fw.value)
+        return f"⏳ FloodWait {fw.value}s"
     except Exception:
-        return False
-    
-#Anti-Spam---------------------------------------------------------------------------------------------------------------
+        return "❌ Failed to join."
 
-#Set timer to avoid spam
-async def set_timer(bot, sender, list1, list2):
+# ---------- link extractor ----------
+def get_link(text: str) -> str | None:
+    pattern = r"(?i)\b((?:https?://)?(?:t\.me|www\.\w+\.\w+)/[^\s]+)"
+    match = re.search(pattern, text)
+    return match.group(1) if match else None
+
+# ---------- anti-spam ----------
+spam_user, spam_time = [], []
+
+async def set_timer(bot, uid: int) -> None:
     now = time.time()
-    list2.append(f'{now}')
-    list1.append(f'{sender}')
-    fuck = await bot.send_message(sender, '`Bot is sleeping for 23 seconds to avoid telegram limitations.`')
+    spam_user.append(uid); spam_time.append(now)
+    tmp = await bot.send_message(uid, "⏳ Cool-down 23 s …")
     await asyncio.sleep(25)
-    await fuck.edit('`Now you can forward a new message again.`')
-    list2.pop(int(list2.index(f'{now}')))
-    list1.pop(int(list1.index(f'{sender}')))
-    
-#check time left in timer
-def check_timer(sender, list1, list2):
-    if f'{sender}' in list1:
-        index = list1.index(f'{sender}')
-        last = list2[int(index)]
-        present = time.time()
-        return False, f"Please wait {24-round(present-float(last))} seconds to forward a new message."
-    else:
-        return True, None
+    await tmp.edit("✅ You can forward again.")
+    spam_user.remove(uid); spam_time.remove(now)
 
-#Screenshot---------------------------------------------------------------------------------------------------------------
+def check_timer(uid: int) -> tuple[bool, str | None]:
+    if uid in spam_user:
+        left = 24 - round(time.time() - spam_time[spam_user.index(uid)])
+        return False, f"Wait {left}s"
+    return True, None
 
-async def screenshot(video, time_stamp, sender):
-    if os.path.isfile(f'{sender}.jpg'):
-        return f'{sender}.jpg'
-    out = str(video).split(".")[0] + ".jpg"
-    cmd = (f"ffmpeg -ss {time_stamp} -i {video} -vframes 1 {out}").split(" ")
-    process = await asyncio.create_subprocess_exec(
-         *cmd,
-         stdout=asyncio.subprocess.PIPE,
-         stderr=asyncio.subprocess.PIPE)
-        
-    stdout, stderr = await process.communicate()
-    x = stderr.decode().strip()
-    y = stdout.decode().strip()
-    print(x)
-    print(y)
-    if os.path.isfile(out):
-        return out
-    else:
-        None
-        
-        
-        
+# ---------- thumbnail ----------
+async def screenshot(video: str, ts: int | float, uid: int) -> str | None:
+    thumb = f"{uid}.jpg"
+    if os.path.exists(thumb):
+        return thumb
+    cmd = ["ffmpeg", "-ss", str(ts), "-i", video, "-vframes", "1", thumb]
+    proc = await asyncio.create_subprocess_exec(*cmd,
+                                                stdout=asyncio.subprocess.PIPE,
+                                                stderr=asyncio.subprocess.PIPE)
+    await proc.communicate()
+    return thumb if os.path.isfile(thumb) else None
