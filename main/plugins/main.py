@@ -77,16 +77,14 @@ async def get_msg(userbot, client, sender, msg_link, edit):
         await edit.edit('❌ Invalid message link.')
         return
 
-    # 🔧 FIX: Resolve the chat first to avoid PeerIdInvalid
+    # 🔧 CRITICAL FIX: Resolve chat to avoid PeerIdInvalid
     try:
         resolved_chat = await userbot.get_chat(chat_id)
-        # Optional: log resolved title for debugging
-        # print(f"Resolved chat: {resolved_chat.title} ({resolved_chat.id})")
     except (ChannelPrivate, UsernameInvalid, PeerIdInvalid, BadRequest) as e:
-        await edit.edit(f'❌ Cannot access chat: {e}')
+        await edit.edit(f'❌ Cannot access chat (even as owner?): {e}\n\nMake sure your userbot account is in the channel.')
         return
     except Exception as e:
-        await edit.edit(f'❌ Failed to resolve chat: {e}')
+        await edit.edit(f'❌ Unexpected error resolving chat: {e}')
         return
 
     # Now fetch the message
@@ -183,18 +181,23 @@ async def clone_handler(bot_, event: Message):
         return
 
     init = await event.reply('⏳ Processing...')
+    
+    # Force subscription check
     if not await is_user_subscribed(event.from_user.id):
+        join_url = f"https://t.me/{FORCESUB}"  # Fixed space typo
         return await init.edit(
             '🔒 Join the channel first.',
             reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton('Join Channel', url=f'https://t.me/{FORCESUB}')]
+                [InlineKeyboardButton('Join Channel', url=join_url)]
             ])
         )
 
+    # Get user's bot token
     bot_token = await db.get_botCreds(event.from_user.id)
     if not bot_token:
         return await init.edit('🤖 Connect your bot via /connect.')
 
+    # Start user's bot
     jvbot = Client(
         name=str(event.from_user.id),
         api_id=API_ID,
@@ -207,13 +210,15 @@ async def clone_handler(bot_, event: Message):
     except Exception as e:
         return await init.edit(f'❌ Bot token error: {e}')
 
+    # Get user credentials (for userbot)
     creds = await db.get_credentials(event.from_user.id)
     if not creds or not all(creds):
         await jvbot.stop()
         return await init.edit('🔑 Login first via /login or /session.')
 
+    # Start userbot
     userbot = Client(
-        name='user',
+        name=f"user_{event.from_user.id}",
         api_id=creds[0],
         api_hash=creds[1],
         session_string=creds[2],
@@ -221,10 +226,14 @@ async def clone_handler(bot_, event: Message):
     )
     try:
         await userbot.start()
+        # ✅ Verify identity and sync
+        me = await userbot.get_me()
+        print(f"[DEBUG] Userbot started as: {me.first_name} (ID: {me.id})")
     except Exception as e:
         await jvbot.stop()
         return await init.edit(f'❌ User session error: {e}')
 
+    # Handle join links
     if 't.me/+' in link or 't.me/joinchat/' in link:
         out = await join(userbot, link)
         await init.edit(out)
@@ -237,5 +246,6 @@ async def clone_handler(bot_, event: Message):
         except Exception as e:
             await init.edit(f'💥 Unexpected error: {e}')
 
+    # Clean shutdown
     await userbot.stop()
     await jvbot.stop()
