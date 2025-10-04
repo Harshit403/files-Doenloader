@@ -1,7 +1,3 @@
-"""
-MongoDB helper for saverestricted bot
-Reads MONGODB_URI from parent package – no decouple needed.
-"""
 from typing import Optional, AsyncGenerator
 import motor.motor_asyncio
 from .. import MONGODB_URI
@@ -15,21 +11,16 @@ class Database:
         self._cli = motor.motor_asyncio.AsyncIOMotorClient(uri)
         self._db = self._cli[name]
         self._users = self._db.users
-        # speed
         self._users.create_index('id', unique=True)
 
-    # ------------------------------------------------------------------
-    # internal helpers
-    # ------------------------------------------------------------------
-    async _update(self, uid: int, payload: dict) -> None:
+    # ---------------- internal helpers ----------------
+    async def _update(self, uid: int, payload: dict) -> None:
         await self._users.update_one({'id': uid}, {'$set': payload}, upsert=True)
 
-    async _rem_field(self, uid: int, field: str) -> None:
+    async def _rem_field(self, uid: int, field: str) -> None:
         await self._users.update_one({'id': uid}, {'$unset': {field: 1}})
 
-    # ------------------------------------------------------------------
-    # users
-    # ------------------------------------------------------------------
+    # ---------------- users ----------------
     def _new_user(self, uid: int) -> dict:
         return {'id': uid, 'banned': False, 'api_id': None,
                 'api_hash': None, 'session': None, 'log': False}
@@ -47,9 +38,7 @@ class Database:
         async for doc in self._users.find({}):
             yield doc
 
-    # ------------------------------------------------------------------
-    # ban
-    # ------------------------------------------------------------------
+    # ---------------- ban ----------------
     async def banning(self, uid: int) -> None:
         await self._update(uid, {'banned': True})
 
@@ -60,9 +49,7 @@ class Database:
         user = await self._users.find_one({'id': uid})
         return user.get('banned', False) if user else False
 
-    # ------------------------------------------------------------------
-    # api / session
-    # ------------------------------------------------------------------
+    # ---------------- api / session ----------------
     async def update_api_id(self, uid: int, api_id: int) -> None:
         await self._update(uid, {'api_id': api_id})
 
@@ -87,9 +74,7 @@ class Database:
             return None, None, None
         return user.get('api_id'), user.get('api_hash'), user.get('session')
 
-    # ------------------------------------------------------------------
-    # login flag
-    # ------------------------------------------------------------------
+    # ---------------- login flag ----------------
     async def loin(self, uid: int) -> None:
         await self._update(uid, {'log': True})
 
@@ -100,9 +85,7 @@ class Database:
         user = await self._users.find_one({'id': uid})
         return user.get('log', False) if user else False
 
-    # ------------------------------------------------------------------
-    # connected bot token
-    # ------------------------------------------------------------------
+    # ---------------- bot token ----------------
     async def set_botCreds(self, uid: int, token: str) -> None:
         await self._users.insert_one({'id': f'bot{uid}', 'bot_token': token})
 
