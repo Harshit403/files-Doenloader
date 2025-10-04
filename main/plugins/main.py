@@ -226,7 +226,7 @@ async def clone_handler(bot_, event: Message):
     )
     try:
         await userbot.start()
-        # ✅ Verify identity and sync
+        await userbot.get_dialogs(limit=1)
         me = await userbot.get_me()
         print(f"[DEBUG] Userbot started as: {me.first_name} (ID: {me.id})")
     except Exception as e:
