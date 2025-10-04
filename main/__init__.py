@@ -29,14 +29,14 @@ def getenv_int_list(key: str, default=None) -> list[int]:
     return [int(u.strip()) for u in raw.split() if u.strip().isdigit()]
 
 # ---------- variables ----------
-API_ID          = getenv_int("API_ID")
-API_HASH        = os.getenv("API_HASH")
+API_ID          = getenv_int("API_ID", "4680197")
+API_HASH        = os.getenv("API_HASH", "495b0228624028d635bd748b22985f67")
 BOT_TOKEN       = os.getenv("BOT_TOKEN")
 FORCESUB        = os.getenv("FORCESUB")
-ACCESS          = getenv_int("ACCESS")
-MONGODB_URI     = os.getenv("MONGODB_URI")
+ACCESS          = getenv_int("ACCESS", "574323")
+MONGODB_URI     = os.getenv("MONGODB_URI" "")
 STRINGLOG       = getenv_int("STRINGLOG", -1001790160966)
-AUTH_USERS      = getenv_int_list("AUTH_USERS")
+AUTH_USERS      = getenv_int_list("AUTH_USERS", "7477152489")
 
 # ---------- sanity checks ----------
 if not all([API_ID, API_HASH, BOT_TOKEN]):
