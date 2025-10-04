@@ -12,8 +12,7 @@ from .. import (bot, FORCESUB, API_HASH, API_ID, AUTH_USERS,
 from ..Database.database import Database
 from ..plugins.helpers import login, logout
 from ..plugins.dbstuff import db
-from utils_bot import (readable_time, get_readable_file_size,
-                         is_cancel as _is_cancel)
+from utils_bot import (readable_time, get_readable_file_size)
 
 logging.basicConfig(format="[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s",
                     level=logging.WARNING)
@@ -21,6 +20,17 @@ logging.basicConfig(format="[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s"
 downloads = os.path.realpath("main/downloads")
 os.makedirs(downloads, exist_ok=True)
 StartTime = time.time()
+
+
+async def _is_cancel(event: Message, text: str):
+    if text.startswith("/abort"):
+        await event.reply("Process aborted.")
+        return True
+    elif text.startswith("/"):  # Bot Commands
+        await event.reply("Cancelled the generation process!")
+        return True
+    else:
+        return False
 
 # ---------- helpers ----------
 def humanbytes(size):
