@@ -22,7 +22,7 @@ os.makedirs(downloads, exist_ok=True)
 StartTime = time.time()
 
 
-async def _is_cancel(event, text: str):
+def _is_cancel(event, text: str):
     if text.startswith("/abort"):
         await event.reply("Process aborted.")
         return True
