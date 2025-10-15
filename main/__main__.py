@@ -19,6 +19,7 @@ async def preload_entities():
         except Exception as e:
             logging.error("⚠️ Failed to preload dialogs: %s", e)
 
+"""
 async def start_pyrogram():
     try:
         await Bot.start()
@@ -26,7 +27,7 @@ async def start_pyrogram():
         logging.warning(f"✅ Pyrogram bot started as @{me.username}")
     except Exception as e:
         logging.error("❌ Failed to start Pyrogram bot: %s", e)
-
+"""
 # Load plugins
 path = "main/plugins/*.py"
 files = glob.glob(path)
