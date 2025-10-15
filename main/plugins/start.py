@@ -56,14 +56,23 @@ async def start_handler(event):
     if not await is_user_subscribed(event.sender_id):
         return await init_msg.edit(
             f"Hello {event.sender.first_name},\nJoin @{FORCESUB} to unlock the bot.",
-            buttons=Button.url("Join", f"https://t.me/{FORCESUB}"))
+            buttons=Button.url("Join", f"https://t.me/{FORCESUB}"))  # ⚠️ removed space
+
     await init_msg.edit(
         f"Hi **{event.sender.first_name}**,\nI save restricted content – send links after login.",
-        buttons=[Button.url("Updates", "https://t.me/BotsCraft")])
+        buttons=[Button.url("Updates", "https://t.me/BotsCraft")])  # ⚠️ removed trailing space
+
+    # ✅ Ensure Telethon knows about LOGS channel
     if LOGS:
-        await bot.send_message(
-            LOGS,
-            f"#NEW_USER [{event.sender.first_name}](tg://user?id={event.sender_id})\nID: {event.sender_id}")
+        try:
+            # Preload dialogs so private channels are cached
+            await bot.get_dialogs(limit=100)
+            await bot.send_message(
+                LOGS,
+                f"#NEW_USER [{event.sender.first_name}](tg://user?id={event.sender_id})\nID: {event.sender_id}")
+        except Exception as e:
+            logging.error("Failed to log new user: %s", e)
+
 
 # ---------- thumbnail ----------
 @bot.on(events.NewMessage(pattern="^/savethumb$", func=lambda e: e.is_private))
