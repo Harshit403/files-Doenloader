@@ -46,8 +46,12 @@ bot = TelegramClient("bot", API_ID, API_HASH)
 
 Bot = Client(
     "save-restricted-bot",
-    api_id=API_ID,
-    api_hash=API_HASH,
     bot_token=BOT_TOKEN,
-    in_memory=True
+    api_id=int(API_ID),
+    api_hash=API_HASH
 )
+try:
+    Bot.start()
+except Exception as e:
+    print(e)
+    sys.exit(1)
