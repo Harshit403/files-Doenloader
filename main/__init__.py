@@ -42,7 +42,7 @@ if not all([API_ID, API_HASH, BOT_TOKEN]):
     sys.exit(1)
 
 # ---------- Clients (defined but NOT started here) ----------
-bot = TelegramClient("bot", API_ID, API_HASH)
+bot = TelegramClient("bot", API_ID, API_HASH).start(bot_token=BOT_TOKEN)
 
 Bot = Client(
     "save-restricted-bot",
