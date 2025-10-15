@@ -27,22 +27,27 @@ def getenv_int_list(key: str, default=None) -> list[int]:
         return default or []
     return [int(u.strip()) for u in raw.split() if u.strip().isdigit()]
 
+# ---------- Environment Variables ----------
 API_ID = getenv_int("API_ID", 4680197)
 API_HASH = os.getenv("API_HASH", "495b0228624028d635bd748b22985f67")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 FORCESUB = os.getenv("FORCESUB")
 MONGODB_URI = os.getenv("MONGODB_URI")
-LOGS = getenv_int("LOGS")  # Optional
+LOGS = getenv_int("LOGS")  # Optional: leave unset or empty in .env to disable
 AUTH_USERS = getenv_int_list("AUTH_USERS", [7477152489])
 
+# ---------- Sanity Check ----------
 if not all([API_ID, API_HASH, BOT_TOKEN]):
-    logging.error("Missing env vars")
+    logging.error("❌ Missing API_ID, API_HASH, or BOT_TOKEN in environment.")
     sys.exit(1)
 
-# ✅ Define clients — DO NOT START THEM HERE
+# ---------- Clients (defined but NOT started here) ----------
 bot = TelegramClient("bot", API_ID, API_HASH)
-# Pyrogram client will be started separately if needed
 
-
-# Pyrogram client (will be started separately if needed)
-Bot = Client("save-restricted-bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
+Bot = Client(
+    "save-restricted-bot",
+    api_id=API_ID,
+    api_hash=API_HASH,
+    bot_token=BOT_TOKEN,
+    in_memory=True
+)
