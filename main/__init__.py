@@ -42,3 +42,7 @@ if not all([API_ID, API_HASH, BOT_TOKEN]):
 # ✅ Define clients — DO NOT START THEM HERE
 bot = TelegramClient("bot", API_ID, API_HASH)
 # Pyrogram client will be started separately if needed
+
+
+# Pyrogram client (will be started separately if needed)
+Bot = Client("save-restricted-bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
