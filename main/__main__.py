@@ -27,6 +27,6 @@ print("Successfully deployed!")
 
 if __name__ == "__main__":
     bot.run_until_disconnected()
-    bot.loop.run_until_complete(preload_entities())
+  #  bot.loop.run_until_complete(preload_entities())
 
 
