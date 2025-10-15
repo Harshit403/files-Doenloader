@@ -44,6 +44,6 @@ with bot:
     bot.start(bot_token=BOT_TOKEN)  # ✅ Use the token from config
 
     bot.loop.run_until_complete(preload_entities())
-    bot.loop.run_until_complete(start_pyrogram())
+   # bot.loop.run_until_complete(start_pyrogram())
 
     bot.run_until_disconnected()
