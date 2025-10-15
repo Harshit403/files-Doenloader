@@ -1,9 +1,6 @@
-# main/__init__.py
-
 import os
 import sys
 import logging
-import asyncio
 from telethon import TelegramClient
 from pyrogram import Client
 from dotenv import load_dotenv
@@ -38,7 +35,7 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 FORCESUB = os.getenv("FORCESUB")
 MONGODB_URI = os.getenv("MONGODB_URI", "mongodb+srv://itsharshit_db_user:QJhxnouQBv07eLcB@cluster0.hcrawmw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 LOGS = getenv_int("LOGS", -1001790160966)
-AUTH_USERS = getenv_int_list("AUTH_USERS", [7477152489])  # Ensure it's a list
+AUTH_USERS = getenv_int_list("AUTH_USERS", 7477152489)
 
 # ---------- sanity checks ----------
 if not all([API_ID, API_HASH, BOT_TOKEN]):
@@ -46,20 +43,19 @@ if not all([API_ID, API_HASH, BOT_TOKEN]):
     sys.exit(1)
 
 # ---------- Telethon client ----------
-bot = TelegramClient("bot", API_ID, API_HASH)
+bot = TelegramClient("bot", API_ID, API_HASH).start(bot_token=BOT_TOKEN)
 
-# Start the bot
-async def start_telethon():
-    await bot.start(bot_token=BOT_TOKEN)
-    # ✅ Critical: Preload dialogs to cache private channels (like LOGS)
+# ✅ Preload dialogs to cache private channels (including LOGS)
+async def preload_dialogs():
     try:
         await bot.get_dialogs(limit=100)
-        logging.warning("✅ Telethon dialogs preloaded – entity cache ready.")
+        logging.warning("Dialogs preloaded – entity cache ready.")
     except Exception as e:
-        logging.error("⚠️ Failed to preload dialogs: %s", e)
+        logging.error("Failed to preload dialogs: %s", e)
 
-# Run Telethon startup
-asyncio.create_task(start_telethon())
+# Schedule it
+import asyncio
+asyncio.create_task(preload_dialogs())
 
 # ---------- Pyrogram client ----------
 try:
@@ -75,4 +71,4 @@ except Exception as exc:
     sys.exit(1)
 
 # ---------- ready ----------
-logging.warning("✅ Both Telethon and Pyrogram clients started successfully.")
+logging.warning("Both clients started successfully.")
