@@ -4,7 +4,7 @@ import glob
 from pathlib import Path
 from main.utils import load_plugins
 import logging
-from . import bot, Bot, LOGS
+from . import bot, Bot, LOGS, BOT_TOKEN  # ← import BOT_TOKEN
 
 logging.basicConfig(
     format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s',
@@ -12,7 +12,6 @@ logging.basicConfig(
 )
 
 async def preload_entities():
-    """Preload dialogs so LOGS channel (if set) is cached."""
     if LOGS:
         try:
             await bot.get_dialogs(limit=100)
@@ -21,7 +20,6 @@ async def preload_entities():
             logging.error("⚠️ Failed to preload dialogs: %s", e)
 
 async def start_pyrogram():
-    """Start Pyrogram client if needed."""
     try:
         await Bot.start()
         me = await Bot.get_me()
@@ -29,7 +27,7 @@ async def start_pyrogram():
     except Exception as e:
         logging.error("❌ Failed to start Pyrogram bot: %s", e)
 
-# Load all plugins
+# Load plugins
 path = "main/plugins/*.py"
 files = glob.glob(path)
 for name in files:
@@ -40,16 +38,11 @@ for name in files:
 
 print("✅ Successfully deployed!")
 
-# Start everything
+# Start Telethon with BOT_TOKEN
 with bot:
-    # Start Telethon bot
-    bot.start(bot_token=bot.bot_token)
+    bot.start(bot_token=BOT_TOKEN)  # ✅ Use the token from config
 
-    # Preload entities for LOGS
     bot.loop.run_until_complete(preload_entities())
-
-    # Start Pyrogram (non-blocking)
     bot.loop.run_until_complete(start_pyrogram())
 
-    # Keep Telethon running
     bot.run_until_disconnected()
