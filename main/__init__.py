@@ -1,10 +1,6 @@
-# main/__init__.py
-
 import os
 import sys
 import logging
-from telethon import TelegramClient
-from pyrogram import Client
 from dotenv import load_dotenv
 
 logging.basicConfig(
@@ -27,19 +23,14 @@ def getenv_int_list(key: str, default=None):
         return default or []
     return [int(u.strip()) for u in raw.split() if u.strip().isdigit()]
 
-# Config
 API_ID = getenv_int("API_ID", 4680197)
 API_HASH = os.getenv("API_HASH", "495b0228624028d635bd748b22985f67")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 FORCESUB = os.getenv("FORCESUB")
 MONGODB_URI = os.getenv("MONGODB_URI")
-LOGS = getenv_int("LOGS")  # Optional: None if not set
+LOGS = getenv_int("LOGS")
 AUTH_USERS = getenv_int_list("AUTH_USERS", [7477152489])
 
 if not all([API_ID, API_HASH, BOT_TOKEN]):
     logging.error("Missing critical env vars")
     sys.exit(1)
-
-# Declare clients (will be initialized in __main__.py)
-bot: TelegramClient = None
-Bot: Client = None
